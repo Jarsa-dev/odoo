@@ -1,10 +1,10 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+
 #    Coded by: Alejandro Negrin anegrin@vauxoo.com,
 #    Planified by: Alejandro Negrin, Humberto Arocha, Moises Lopez
 #    Finance by: Vauxoo.
 #    Audited by: Humberto Arocha (hbto@vauxoo.com) y Moises Lopez (moylop260@vauxoo.com)
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     "name": "Mexico - Accounting",
@@ -30,13 +30,16 @@ With this module you will have:
 
 .. SAT: http://www.sat.gob.mx/
     """,
-    "depends": ["account", "base_vat"],
-    "demo_xml": [],
-    "data": [
-        "data/account_chart.xml",
-        "data/account_tax.xml",
-        "data/account_chart_template.yml",
+    "depends": [
+        "account",
+        "base_vat",
+        "account_tax_cash_basis",
     ],
-    "installable": True,
-    "certificate": False,
+    "data": [
+        "data/account_tag_data.xml",
+        "data/l10n_mx_chart_data.xml",
+        "data/account_data.xml",
+        "data/account_tax_data.xml",
+        "data/account_chart_template_data.yml",
+    ],
 }
