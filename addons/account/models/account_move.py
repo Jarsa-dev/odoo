@@ -1448,14 +1448,15 @@ class AccountPartialReconcile(models.Model):
         for rev_move in self.env['account.move'].browse(reversed_moves):
             if not rev_move.rate_diff_partial_rec_id:
                 continue
-            origin_move = exchange_rate_entries.filtered(lambda x: x.rate_diff_partial_rec_id == rev_move.rate_diff_partial_rec_id)
+            origin_moves = exchange_rate_entries.filtered(lambda x: x.rate_diff_partial_rec_id == rev_move.rate_diff_partial_rec_id)
             for acm_line in rev_move.line_ids:
                 if acm_line.account_id.reconcile:
-                    for origin_line in origin_move.line_ids:
-                        if origin_line.account_id == acm_line.account_id and origin_line.debit == acm_line.credit and origin_line.credit == acm_line.debit:
-                            to_unlink |= origin_line.matched_debit_ids | origin_line.matched_credit_ids
-                            to_rec = origin_line + acm_line
-                            pairs_to_rec.append(to_rec)
+                    for origin_move in origin_moves:
+                        for origin_line in origin_move.line_ids:
+                            if origin_line.account_id == acm_line.account_id and origin_line.debit == acm_line.credit and origin_line.credit == acm_line.debit:
+                                to_unlink |= origin_line.matched_debit_ids | origin_line.matched_credit_ids
+                                to_rec = origin_line + acm_line
+                                pairs_to_rec.append(to_rec)
         #make sure that the exchange_rate_entries aren't linked to any partial reconciliation anymore
         exchange_rate_entries.write({'rate_diff_partial_rec_id': False})
         # the call to super() had to be delayed in order to mark the move lines to reconcile together (to use 'rate_diff_partial_rec_id')
