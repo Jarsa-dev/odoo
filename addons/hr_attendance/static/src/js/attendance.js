@@ -44,10 +44,42 @@ var AttendanceSlider = Widget.extend({
         });
         return this.check_attendance();
     },
+    validate_transaction_number: function(response, employee_id){
+        if(response === false){
+            do{
+                var res = objBC.GetTmpTransNum(inToken, "", "", "");
+                if(res == -1){
+                    var try_again_num = confirm("No se pudo obtener la transacción de BioClient [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                        "Transacción es requerida para la operacion solicitada ¿Desea Reintentar?");
+                    if (try_again_num === false){
+                        try_trans_num = false;
+                        return;
+                    }
+                }
+                else{
+                    try_trans_num = false;
+                    var inTmpTransNum = objBC.outTmpTransNum;
+                    var hr_employee = new data.DataSet(self, 'hr.employee');
+                    hr_employee.call('save_transaction_number', [inTmpTransNum, employee_id]);
+                    ajax.jsonRpc('/bioflow/set_transaction', 'call', {'lead_id': obj_id, 'transaction': inTmpTransNum});   
+                }
+            }while(try_trans_num);
+        }
+        else {
+            return response;
+        }
+    },
     do_update_attendance: function () {
         var self = this;
         GMaps.geolocate({
           success: function(position) {
+            var hr_employee = new data.DataSet(self, 'hr.employee');
+            hr_employee.call('attendance_action_change', [
+                [self.employee.id], position.coords.latitude, position.coords.longitude,
+            ]).done(function (result) {
+                self.last_sign = new Date();
+                 self.set({"signed_in": ! self.get("signed_in")});
+            });
             var inToken = '';
             var inTmpTransNum = '';
             // ----- Construir token ----- //
@@ -73,6 +105,9 @@ var AttendanceSlider = Widget.extend({
                 alert("No se pudo realizar la conexion con bioengine: " + err.message);
             }
             // ------ Finalizar token  ------ //
+            hr_employee.call('get_transaction_number',[self.employee.id]).done(function(response){
+                inTmpTransNum = self.validate_transaction_number(response, self.employee.id);
+            });
             // ------ Contruir transaccion ------ //
             do{
                 var res_obj = objBC.GetTmpTransNum(inToken, "", "", "");

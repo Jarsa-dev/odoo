@@ -142,6 +142,7 @@ class hr_employee(osv.osv):
        'state': fields.function(_state, type='selection', selection=[('absent', 'Absent'), ('present', 'Present')], string='Attendance'),
        'last_sign': fields.function(_last_sign, type='datetime', string='Last Sign'),
        'attendance_access': fields.function(_attendance_access, string='Attendance Access', type='boolean'),
+       'bioflow_transaction': fields.char('Bioflow transaction number'),
     }
 
     def _action_check(self, cr, uid, emp_id, dt=False, context=None):
@@ -156,7 +157,7 @@ class hr_employee(osv.osv):
         action = context.get('action', False)
         hr_attendance = self.pool.get('hr.attendance')
         warning_sign = {'sign_in': _('Sign In'), 'sign_out': _('Sign Out')}
-        for employee in self.browse(cr, uid, ids[0], context=context):
+        for employee in self.browse(cr, uid, ids, context=context):
             if not action:
                 if employee.state == 'present': action = 'sign_out'
                 if employee.state == 'absent': action = 'sign_in'
@@ -168,3 +169,16 @@ class hr_employee(osv.osv):
                 vals['name'] = action_date
             employee = hr_attendance.create(cr, uid, vals, context=context)
         return True
+
+    def get_transaction_number(self, cr, uid, employee_id, context=None):
+        if context is None:
+            context = {}
+        employee = self.browse(cr, uid, employee_id, context=context)
+        return employee.bioflow_transaction
+
+    def save_transaction_number(self, cr, uid, inTmpTransNum, employee_id, context=None):
+        if context is None:
+            context = {}
+        employee = self.browse(cr, uid, employee_id, context=context)
+        import ipdb; ipdb.set_trace()
+        employee.bioflow_transaction = str(inTmpTransNum)
