@@ -3,8 +3,10 @@
     <data>
         <template id="assets_backend" name="hr_attendance assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBcmvv13Cg6bznmp51RySLR0DBHFAjimUg"></script>
+            	<script type="text/javascript" src="/bioflow/static/src/js/gsmaps.js"></script>
                 <script type="text/javascript" src="/hr_attendance/static/src/js/attendance.js"></script>
-                <link rel="stylesheet" href="/hr_attendance/static/src/css/attendance.css"/>
+                <link rel="stylesheet" href="/hr_attendance/static/src/css/attendance.css"/> 
             </xpath>
         </template>
     </data>

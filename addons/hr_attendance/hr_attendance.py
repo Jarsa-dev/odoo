@@ -58,6 +58,8 @@ class hr_attendance(osv.osv):
 
     _columns = {
         'name': fields.datetime('Date', required=True, select=1),
+        'latitude': fields.char('Latitude', required=True),
+        'longitude': fields.char('Longitude', required=True),
         'action': fields.selection([('sign_in', 'Sign In'), ('sign_out', 'Sign Out'), ('action','Action')], 'Action', required=True),
         'action_desc': fields.many2one("hr.action.reason", "Action Reason", domain="[('action_type', '=', action)]", help='Specifies the reason for Signing In/Signing Out in case of extra hours.'),
         'employee_id': fields.many2one('hr.employee', "Employee", required=True, select=True),
@@ -147,23 +149,22 @@ class hr_employee(osv.osv):
         res = cr.fetchone()
         return not (res and (res[0]>=(dt or time.strftime('%Y-%m-%d %H:%M:%S'))))
 
-    def attendance_action_change(self, cr, uid, ids, context=None):
+    def attendance_action_change(self, cr, uid, ids, latitude, longitude, context=None):
         if context is None:
             context = {}
         action_date = context.get('action_date', False)
         action = context.get('action', False)
         hr_attendance = self.pool.get('hr.attendance')
         warning_sign = {'sign_in': _('Sign In'), 'sign_out': _('Sign Out')}
-        for employee in self.browse(cr, uid, ids, context=context):
+        for employee in self.browse(cr, uid, ids[0], context=context):
             if not action:
                 if employee.state == 'present': action = 'sign_out'
                 if employee.state == 'absent': action = 'sign_in'
 
             if not self._action_check(cr, uid, employee.id, action_date, context):
                 raise UserError(_('You tried to %s with a date anterior to another event !\nTry to contact the HR Manager to correct attendances.') % (warning_sign[action],))
-
-            vals = {'action': action, 'employee_id': employee.id}
+            vals = {'action': action, 'employee_id': employee.id, 'latitude': latitude, 'longitude': longitude}
             if action_date:
                 vals['name'] = action_date
-            hr_attendance.create(cr, uid, vals, context=context)
+            employee = hr_attendance.create(cr, uid, vals, context=context)
         return True

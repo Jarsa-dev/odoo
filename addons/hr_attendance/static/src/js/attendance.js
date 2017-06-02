@@ -46,12 +46,92 @@ var AttendanceSlider = Widget.extend({
     },
     do_update_attendance: function () {
         var self = this;
-        var hr_employee = new data.DataSet(self, 'hr.employee');
-        hr_employee.call('attendance_action_change', [
-            [self.employee.id]
-        ]).done(function (result) {
-            self.last_sign = new Date();
-            self.set({"signed_in": ! self.get("signed_in")});
+        GMaps.geolocate({
+          success: function(position) {
+            var inToken = '';
+            var inTmpTransNum = '';
+            // ----- Construir token ----- //
+            try {
+                do{
+                    objBC = new ActiveXObject("BioClient.clsBioClient");
+                    var res = objBC.GetToken("", "", "");
+                    inToken = objBC.outToken;
+                    if (res == -1){
+                        var try_again = confirm("No se pudo obtener token de BioEngine Client [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                            "Token es requerido para la aplicacion ¿Desea Reintentar?");
+                        if (try_again === false){
+                            try_token = false;
+                            return;
+                        }
+                    }
+                    else{
+                        try_token = false;
+                    }
+                }while(try_token);
+            }
+            catch(err) {
+                alert("No se pudo realizar la conexion con bioengine: " + err.message);
+            }
+            // ------ Finalizar token  ------ //
+            // ------ Contruir transaccion ------ //
+            do{
+                var res_obj = objBC.GetTmpTransNum(inToken, "", "", "");
+                if(res_obj == -1){
+                    var try_again_num = confirm("No se pudo obtener la transacción de BioClient [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                        "Transacción es requerida para la operacion solicitada ¿Desea Reintentar?");
+                    if (try_again_num === false){
+                        try_trans_num = false;
+                        return;
+                    }
+                }
+                else{
+                    try_trans_num = false;
+                    inTmpTransNum = objBC.outTmpTransNum;
+                }
+            }while(try_trans_num);
+            // ------ Finalizar transaccion ----- //
+            // ------ Comenzar dedos ------ //
+            do{
+                var res = objBC.CaptureFinger(
+                inToken,
+                inTmpTransNum,
+                true,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                "",
+                "");
+                if (res == -1 || (res != -1 && objBC.outErrNum != "0")){
+                    var try_again_num = confirm("No se pudo capturar las huellas [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                        "Huellas son requeridas para el enrolamiento ¿Desea Reintentar?");
+                    if (try_again_num === false){
+                        try_fingers = false;
+                        return;
+                    }
+                }
+                else{
+                    try_fingers = false;
+                    self.set({"signed_in": ! self.get("signed_in")});
+                }
+            }while(try_fingers);
+            // ------ Finalizar dedos ----- //
+          },
+          error: function(error) {
+            alert('Geolocation failed: '+error.message);
+          },
+          not_supported: function() {
+            alert("Your browser does not support geolocation");
+          },
+          always: function() {
+          }
         });
     },
     check_attendance: function () {
@@ -62,7 +142,7 @@ var AttendanceSlider = Widget.extend({
             ['user_id', '=', self.session.uid]
         ]);
         return employee.read_slice(['id', 'name', 'state', 'last_sign', 'attendance_access']).then(function (res) {
-            if (_.isEmpty(res) )
+            if (_.isEmpty(res))
                 return;
             if (res[0].attendance_access === false){
                 return;
