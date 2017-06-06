@@ -552,7 +552,7 @@ msgstr "Un diccionario de Python que será evaluada para proporcionar valores po
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "A good pipeline should have between 5 and 7 stages"
-msgstr "Un buen Flujo de Ventas debe tener entre 5 y 7 etapas"
+msgstr "Un buen Proceso de enrolamiento debe tener entre 5 y 7 etapas"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -1034,7 +1034,7 @@ msgstr ""
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Configure the stages of your sales pipeline"
-msgstr "Configure las etapas de su flujo de ventas"
+msgstr "Configure las etapas de su Proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -2737,7 +2737,7 @@ msgstr "Oportunidades ganadas por Equipo"
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Opportunities pipeline"
-msgstr "Oportunidades del flujo de ventas"
+msgstr "Oportunidades del Proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.view_crm_case_opportunities_filter
@@ -2904,7 +2904,7 @@ msgstr ""
 #: model:ir.ui.menu,name:crm.crm_opportunity_report_menu
 #: model:ir.ui.view,arch_db:crm.crm_team_salesteams_view_kanban
 msgid "Pipeline"
-msgstr "Flujo de ventas"
+msgstr "Proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.actions.act_window,name:crm.action_report_crm_opportunity_salesteam
@@ -2914,7 +2914,7 @@ msgstr "Flujo de ventas"
 #: model:ir.ui.view,arch_db:crm.crm_opportunity_report_view_pivot
 #: model:ir.ui.view,arch_db:crm.crm_team_salesteams_view_kanban
 msgid "Pipeline Analysis"
-msgstr "Análisis de Flujo de Ventas"
+msgstr "Análisis de Proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.actions.act_window,help:crm.crm_opportunity_report_action
@@ -4053,7 +4053,7 @@ msgstr "Tu LinkedIn o redes sociales"
 #: model:ir.ui.menu,name:crm.menu_crm_opportunities
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Your Pipeline"
-msgstr "Tu flujo de ventas"
+msgstr "Tu Proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
