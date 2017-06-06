@@ -77,8 +77,9 @@ var AttendanceSlider = Widget.extend({
             hr_employee.call('attendance_action_change', [
                 [self.employee.id], position.coords.latitude, position.coords.longitude,
             ]).done(function (result) {
+                console.log(result);
                 self.last_sign = new Date();
-                 self.set({"signed_in": ! self.get("signed_in")});
+                self.set({"signed_in": ! self.get("signed_in")});
             });
             // var inToken = '';
             // var inTmpTransNum = '';
