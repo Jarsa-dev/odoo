@@ -4053,7 +4053,7 @@ msgstr "Tu LinkedIn o redes sociales"
 #: model:ir.ui.menu,name:crm.menu_crm_opportunities
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Your Pipeline"
-msgstr "Tu flujo de ventas"
+msgstr "Proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
