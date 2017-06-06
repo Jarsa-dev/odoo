@@ -7,6 +7,7 @@ from datetime import datetime
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp.exceptions import UserError
+import requests
 
 
 class hr_action_reason(osv.osv):
@@ -157,18 +158,34 @@ class hr_employee(osv.osv):
         action = context.get('action', False)
         hr_attendance = self.pool.get('hr.attendance')
         warning_sign = {'sign_in': _('Sign In'), 'sign_out': _('Sign Out')}
+
         for employee in self.browse(cr, uid, ids, context=context):
             if not action:
                 if employee.state == 'present': action = 'sign_out'
                 if employee.state == 'absent': action = 'sign_in'
-
             if not self._action_check(cr, uid, employee.id, action_date, context):
                 raise UserError(_('You tried to %s with a date anterior to another event !\nTry to contact the HR Manager to correct attendances.') % (warning_sign[action],))
             vals = {'action': action, 'employee_id': employee.id, 'latitude': latitude, 'longitude': longitude}
             if action_date:
                 vals['name'] = action_date
-            employee = hr_attendance.create(cr, uid, vals, context=context)
-        return True
+            cartodb_request = requests.post(
+                'http://35.162.224.46/visor/cartoserv/cartolatlng.php',
+                json={
+                    'lat': float(latitude),
+                    'lng': float(longitude),
+                    'check': 1,
+                    'id': employee.user_id.id,
+                    'vendedor': employee.user_id.name,
+                    'accion': 'ins',
+                    'order_no': '',
+                    'productos': {},
+                    })
+            if cartodb_request.json()['status'] == 0:
+                raise UserError(cartodb_request.json()['msg'])
+                return False
+            else:
+                employee = hr_attendance.create(cr, uid, vals, context=context)
+                return True
 
     def get_transaction_number(self, cr, uid, employee_id, context=None):
         if context is None:
@@ -180,5 +197,4 @@ class hr_employee(osv.osv):
         if context is None:
             context = {}
         employee = self.browse(cr, uid, employee_id, context=context)
-        import ipdb; ipdb.set_trace()
         employee.bioflow_transaction = str(inTmpTransNum)
