@@ -552,7 +552,7 @@ msgstr "Un diccionario de Python que será evaluada para proporcionar valores po
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "A good pipeline should have between 5 and 7 stages"
-msgstr "Un buen proceso de enrolamiento debe tener entre 5 y 7 etapas"
+msgstr "Un buen Proceso de enrolamiento debe tener entre 5 y 7 etapas"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -1035,6 +1035,7 @@ msgstr ""
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Configure the stages of your sales pipeline"
 msgstr "Configure las etapas de su proceso de enrolamiento"
+
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -2739,6 +2740,7 @@ msgstr "Oportunidades ganadas por Equipo"
 msgid "Opportunities pipeline"
 msgstr "Oportunidades del proceso de enrolamiento"
 
+
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.view_crm_case_opportunities_filter
 msgid "Opportunities that are assigned to me"
@@ -2906,6 +2908,7 @@ msgstr ""
 msgid "Pipeline"
 msgstr "proceso de enrolamiento"
 
+
 #. module: crm
 #: model:ir.actions.act_window,name:crm.action_report_crm_opportunity_salesteam
 #: model:ir.actions.act_window,name:crm.crm_opportunity_report_action
@@ -2915,6 +2918,7 @@ msgstr "proceso de enrolamiento"
 #: model:ir.ui.view,arch_db:crm.crm_team_salesteams_view_kanban
 msgid "Pipeline Analysis"
 msgstr "Análisis de proceso de enrolamiento"
+
 
 #. module: crm
 #: model:ir.actions.act_window,help:crm.crm_opportunity_report_action
@@ -4053,7 +4057,7 @@ msgstr "Tu LinkedIn o redes sociales"
 #: model:ir.ui.menu,name:crm.menu_crm_opportunities
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Your Pipeline"
-msgstr "Proceso de enrolamiento"
+msgstr "Tu Proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
