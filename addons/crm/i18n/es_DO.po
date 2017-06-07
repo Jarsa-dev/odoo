@@ -328,7 +328,7 @@ msgid ""
 "<span><strong>Click to register a new business opportunity</strong>. Once "
 "the opportunity is created, you will be able to drag and drop it in your "
 "sales pipeline.</span>"
-msgstr "<span><strong> Haga clic aquí para registrar una nueva oportunidad de negocio </strong>. Una vez que haya creado la oportunidad, usted será capaz de arrastrarlo en su flujo de ventas.</span>"
+msgstr "<span><strong> Haga clic aquí para registrar una nueva oportunidad de negocio </strong>. Una vez que haya creado la oportunidad, usted será capaz de arrastrarlo en su proceso de enrolamiento.</span>"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -1037,7 +1037,7 @@ msgstr "Matriz de Competición comparando precios"
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Configure the stages of your sales pipeline"
-msgstr "Configure las etapas de su flujo de ventas"
+msgstr "Configure las etapas de su proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -2624,7 +2624,7 @@ msgstr "Odoo Sign"
 msgid ""
 "Odoo helps you keep track of your sales pipeline to follow\n"
 "                    up potential sales and better forecast your future revenues."
-msgstr "Odoo le ayuda a mantener rastro de su flujo de ventas para \nseguir ventas potenciales y proyectar mejor sus ingresos futuros."
+msgstr "Odoo le ayuda a mantener rastro de su proceso de enrolamiento para \nseguir ventas potenciales y proyectar mejor sus ingresos futuros."
 
 #. module: crm
 #: model:ir.actions.act_window,help:crm.crm_lead_opportunities
@@ -2632,7 +2632,7 @@ msgstr "Odoo le ayuda a mantener rastro de su flujo de ventas para \nseguir vent
 msgid ""
 "Odoo helps you keep track of your sales pipeline to follow\n"
 "                up potential sales and better forecast your future revenues."
-msgstr "Odoo le ayuda a mantener rastro de su flujo de ventas para seguir \nventas potenciales y proyectar mejor sus ingresos futuros."
+msgstr "Odoo le ayuda a mantener rastro de su proceso de enrolamiento para seguir \nventas potenciales y proyectar mejor sus ingresos futuros."
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -2675,7 +2675,7 @@ msgid ""
 "setting up a continuous improvement approach.We recommend you to organize "
 "weekly sales meeting with the team during which you will do a pipeline "
 "review."
-msgstr "Una vez que usted ha desplegado su CRM, es tiempo de incrementar sus ingresos. Comience por establecer un enfoque de mejora contínua. Le recomendamos que organice reuniones de ventas semanales con el equipo durante la cual usted hará revisiones al flujo de ventas."
+msgstr "Una vez que usted ha desplegado su CRM, es tiempo de incrementar sus ingresos. Comience por establecer un enfoque de mejora contínua. Le recomendamos que organice reuniones de ventas semanales con el equipo durante la cual usted hará revisiones al proceso de enrolamiento."
 
 #. module: crm
 #: code:addons/crm/base_partner_merge.py:318
@@ -2725,7 +2725,7 @@ msgid ""
 "deadlines or the number of interactions per opportunity. This report is "
 "mainly used by the sales manager in order to do the periodic review with the"
 " teams of the sales pipeline."
-msgstr "El Análisis de las Oportunidades le da un acceso instantáneo a las oportunidades con información como el ingreso esperado, costo planificado, plazos incumplidos o el número de interacciones por oportunidad. Este reporte es usado principalmente por el director de ventas con el fin de hacer la revisión periódica con los equipos del flujo de ventas."
+msgstr "El Análisis de las Oportunidades le da un acceso instantáneo a las oportunidades con información como el ingreso esperado, costo planificado, plazos incumplidos o el número de interacciones por oportunidad. Este reporte es usado principalmente por el director de ventas con el fin de hacer la revisión periódica con los equipos del proceso de enrolamiento."
 
 #. module: crm
 #: model:ir.filters,name:crm.filter_opportunity_opportunities_cohort
@@ -2907,7 +2907,7 @@ msgstr "Guión de llamadas"
 #: model:ir.ui.menu,name:crm.crm_opportunity_report_menu
 #: model:ir.ui.view,arch_db:crm.crm_team_salesteams_view_kanban
 msgid "Pipeline"
-msgstr " Flujo de Ventas"
+msgstr " proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.actions.act_window,name:crm.action_report_crm_opportunity_salesteam
@@ -3244,7 +3244,7 @@ msgid ""
 "                      significant boost, we will help you get the most out of\n"
 "                      Odoo CRM to transform how your salespeople work.\n"
 "                      That's the purpose of this guide."
-msgstr "Configurar su flujo de ventas es sólo el primer paso. Para lograr \nuna mejora significativa, nosotros le ayudaremos a sacar el máximo \ndel CRM de Odoo para transformar la forma de trabajo de sus vendedores. \nEse es el propósito de esta guía."
+msgstr "Configurar su proceso de enrolamiento es sólo el primer paso. Para lograr \nuna mejora significativa, nosotros le ayudaremos a sacar el máximo \ndel CRM de Odoo para transformar la forma de trabajo de sus vendedores. \nEse es el propósito de esta guía."
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.view_sale_config_settings
@@ -4056,7 +4056,7 @@ msgstr "Mi LinkedIn o páginas de redes sociales"
 #: model:ir.ui.menu,name:crm.menu_crm_opportunities
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Your Pipeline"
-msgstr "Mi Flujo de Ventas"
+msgstr "Mi proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner

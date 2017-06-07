@@ -330,7 +330,7 @@ msgid ""
 "<span><b>This is a business opportunity.</b> Drag and drop it to another "
 "column while you move forward in the sales cycle. Click to zoom in the "
 "opportunity.</span>"
-msgstr "<span><b>Esta es una oportunidad de negocio.</b>Mover a otra columna según la evolución del flujo de ventas. Clic para hacer ampliar la oportunidad.</span>"
+msgstr "<span><b>Esta es una oportunidad de negocio.</b>Mover a otra columna según la evolución del proceso de enrolamiento. Clic para hacer ampliar la oportunidad.</span>"
 
 #. module: crm
 #: model:web.tip,description:crm.crm_tip_6
@@ -338,7 +338,7 @@ msgid ""
 "<span><strong>Click to register a new business opportunity</strong>. Once "
 "the opportunity is created, you will be able to drag and drop it in your "
 "sales pipeline.</span>"
-msgstr "<span><strong>Clic para registrar una nueva oportunidad de negocio</strong>. Una vez creada la oportunidad podrá moverse a lo largo del flujo de ventas.</span>"
+msgstr "<span><strong>Clic para registrar una nueva oportunidad de negocio</strong>. Una vez creada la oportunidad podrá moverse a lo largo del proceso de enrolamiento.</span>"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
@@ -985,7 +985,7 @@ msgstr "Haga click para definir una nueva etiqueta de ventas."
 #. module: crm
 #: model:ir.actions.act_window,help:crm.crm_lead_stage_act
 msgid "Click to set a new stage in your lead/opportunity pipeline."
-msgstr "Hacer clic para añadir una nueva etapa en el flujo de ventas."
+msgstr "Hacer clic para añadir una nueva etapa en el proceso de enrolamiento."
 
 #. module: crm
 #: model:web.tip,description:crm.crm_tip_2
@@ -4066,7 +4066,7 @@ msgstr "Tu LinkedIn o páginas de redes sociales"
 #: model:ir.ui.menu,name:crm.menu_crm_opportunities
 #: model:ir.ui.view,arch_db:crm.crm_planner
 msgid "Your Pipeline"
-msgstr "Flujo de ventas"
+msgstr "proceso de enrolamiento"
 
 #. module: crm
 #: model:ir.ui.view,arch_db:crm.crm_planner
