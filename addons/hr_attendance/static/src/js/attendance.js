@@ -71,92 +71,106 @@ var AttendanceSlider = Widget.extend({
     },
     do_update_attendance: function () {
         var self = this;
+        console.log('Actualiza');
         GMaps.geolocate({
           success: function(position) {
+            console.log('Geolocaliza');
             var hr_employee = new data.DataSet(self, 'hr.employee');
-            hr_employee.call('attendance_action_change', [
-                [self.employee.id], position.coords.latitude, position.coords.longitude,
-            ]).done(function (result) {
-                console.log(result);
-                self.last_sign = new Date();
+            var inToken = '';
+            var inTmpTransNum = '';
+            console.log(! self.get('signed_in'));
+            if (!self.get('signed_in')){
+                console.log('Entro al if!');
+                // ----- Construir token ----- //
+                try {
+                    console.log('Construye el token');
+                    do{
+                        objBC = new ActiveXObject("BioClient.clsBioClient");
+                        var res = objBC.GetToken("", "", "");
+                        inToken = objBC.outToken;
+                        if (res == -1){
+                            var try_again = confirm("No se pudo obtener token de BioEngine Client [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                                "Token es requerido para la aplicacion ¿Desea Reintentar?");
+                            if (try_again === false){
+                                try_token = false;
+                                return;
+                            }
+                        }
+                        else{
+                            try_token = false;
+                        }
+                    }while(try_token);
+                }
+                catch(err) {
+                    alert("No se pudo realizar la conexion con bioengine: " + err.message);
+                }
+                // ------ Finalizar token  ------ //
+                hr_employee.call('get_transaction_number',[self.employee.id]).done(function(response){
+                    inTmpTransNum = self.validate_transaction_number(response, self.employee.id);
+                });
+                // ------ Contruir transaccion ------ //
+                do{
+                    console.log('Construye numero de transaccion')
+                    var res_obj = objBC.GetTmpTransNum(inToken, "", "", "");
+                    if(res_obj == -1){
+                        var try_again_num = confirm("No se pudo obtener la transacción de BioClient [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                            "Transacción es requerida para la operacion solicitada ¿Desea Reintentar?");
+                        if (try_again_num === false){
+                            try_trans_num = false;
+                            return;
+                        }
+                    }
+                    else{
+                        try_trans_num = false;
+                        inTmpTransNum = objBC.outTmpTransNum;
+                    }
+                }while(try_trans_num);
+                // ------ Finalizar transaccion ----- //
+                // ------ Comenzar dedos ------ //
+                do{
+                    console.log('Comienza a registrar la imagen');
+                    var res = objBC.CapturePic(inToken, inTmpTransNum, false, "FACE", "", "");
+                    if (res == -1 || (res != -1 && objBC.outErrNum != "0")){
+                        var try_again_pic = confirm("No se pudo realizar la captura de fotogragfia [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                            "La fotografia es requerida para el enrolamiento ¿Desea Reintentar?");
+                        if (try_again_pic === false){
+                            try_pic = false;
+                            return;
+                        }
+                    }
+                    else{
+                        try_pic = false;
+                        do {
+                            res = objBC.GetDataLocal(inToken, inTmpTransNum, "FACE", "", "", "");
+                            if (res == -1 ){
+                                var try_again_data_local = confirm("No se pudo obtener el dato [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                                    "¿Desea Reintentar?");
+                                if (try_again_data_local === false){
+                                    try_data_local = false;
+                                    return;
+                                }
+                            }
+                            else{
+                                console.log(position.coords.latitude);
+                                console.log(position.coords.longitude);                            
+                                try_data_local = false;
+                                picture = objBC.outData;
+                                hr_employee.call('attendance_action_change', [
+                                    [self.employee.id], position.coords.latitude, position.coords.longitude,
+                                ]).done(function (result) {
+                                    self.last_sign = new Date();
+                                    self.set({"signed_in": ! self.get("signed_in")});
+                                });
+                                console.log('Capture pick - ' + picture);
+                            }
+                        }while(try_data_local);
+                    }
+                }while(try_pic);
+            }else{
+                console.log('Cayo al else!');
                 self.set({"signed_in": ! self.get("signed_in")});
-            });
-            // var inToken = '';
-            // var inTmpTransNum = '';
-            // // ----- Construir token ----- //
-            // try {
-            //     do{
-            //         objBC = new ActiveXObject("BioClient.clsBioClient");
-            //         var res = objBC.GetToken("", "", "");
-            //         inToken = objBC.outToken;
-            //         if (res == -1){
-            //             var try_again = confirm("No se pudo obtener token de BioEngine Client [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-            //                 "Token es requerido para la aplicacion ¿Desea Reintentar?");
-            //             if (try_again === false){
-            //                 try_token = false;
-            //                 return;
-            //             }
-            //         }
-            //         else{
-            //             try_token = false;
-            //         }
-            //     }while(try_token);
-            // }
-            // catch(err) {
-            //     alert("No se pudo realizar la conexion con bioengine: " + err.message);
-            // }
-            // // ------ Finalizar token  ------ //
-            // hr_employee.call('get_transaction_number',[self.employee.id]).done(function(response){
-            //     inTmpTransNum = self.validate_transaction_number(response, self.employee.id);
-            // });
-            // // ------ Contruir transaccion ------ //
-            // do{
-            //     var res_obj = objBC.GetTmpTransNum(inToken, "", "", "");
-            //     if(res_obj == -1){
-            //         var try_again_num = confirm("No se pudo obtener la transacción de BioClient [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-            //             "Transacción es requerida para la operacion solicitada ¿Desea Reintentar?");
-            //         if (try_again_num === false){
-            //             try_trans_num = false;
-            //             return;
-            //         }
-            //     }
-            //     else{
-            //         try_trans_num = false;
-            //         inTmpTransNum = objBC.outTmpTransNum;
-            //     }
-            // }while(try_trans_num);
-            // // ------ Finalizar transaccion ----- //
-            // // ------ Comenzar dedos ------ //
-            // do{
-            //     var res = objBC.CapturePic(inToken, inTmpTransNum, false, "FACE", "", "");
-            //     if (res == -1 || (res != -1 && objBC.outErrNum != "0")){
-            //         var try_again_pic = confirm("No se pudo realizar la captura de fotogragfia [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-            //             "La fotografia es requerida para el enrolamiento ¿Desea Reintentar?");
-            //         if (try_again_pic === false){
-            //             try_pic = false;
-            //             return;
-            //         }
-            //     }
-            //     else{
-            //         try_pic = false;
-            //         do {
-            //             res = objBC.GetDataLocal(inToken, inTmpTransNum, "FACE", "", "", "");
-            //             if (res == -1 ){
-            //                 var try_again_data_local = confirm("No se pudo obtener el dato [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-            //                     "¿Desea Reintentar?");
-            //                 if (try_again_data_local === false){
-            //                     try_data_local = false;
-            //                     return;
-            //                 }
-            //             }
-            //             else{
-            //                 try_data_local = false;
-            //                 picture = objBC.outData;
-            //                 console.log('Capture pick - ' + picture);
-            //             }
-            //         }while(try_data_local);
-            //     }
-            // }while(try_pic);
+            }
+
             // // ------ Finalizar dedos ----- //
           },
           error: function(error) {
@@ -166,6 +180,7 @@ var AttendanceSlider = Widget.extend({
             alert("Your browser does not support geolocation");
           },
           always: function() {
+            console.log('Done!');
           }
         });
     },
