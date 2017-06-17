@@ -3,6 +3,7 @@
 {
     'name': 'City Addresses',
     'summary': 'Add a many2one field city on addresses',
+    'version': '10.0.1.0.0',
     'sequence': '19',
     'category': 'Base',
     'complexity': 'easy',
