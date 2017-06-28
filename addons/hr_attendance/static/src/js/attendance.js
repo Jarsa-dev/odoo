@@ -71,107 +71,153 @@ var AttendanceSlider = Widget.extend({
     },
     do_update_attendance: function () {
         var self = this;
-        console.log('Actualiza');
         GMaps.geolocate({
           success: function(position) {
+            console.log('Actualiza');
             // console.log('Geolocaliza');
             var hr_employee = new data.DataSet(self, 'hr.employee');
             var inToken = '';
             var inTmpTransNum = '';
+            var inBioKey = '';
+            var res = '';
             console.log(! self.get('signed_in'));
             if (!self.get('signed_in')){
                 console.log('Entro al if!');
-                // ----- Construir token ----- //
-                // try {
-                //     console.log('Construye el token');
-                //     do{
-                //         objBC = new ActiveXObject("BioClient.clsBioClient");
-                //         var res = objBC.GetToken("", "", "");
-                //         inToken = objBC.outToken;
-                //         if (res == -1){
-                //             var try_again = confirm("No se pudo obtener token de BioEngine Client [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-                //                 "Token es requerido para la aplicacion ¿Desea Reintentar?");
-                //             if (try_again === false){
-                //                 try_token = false;
-                //                 return;
-                //             }
-                //         }
-                //         else{
-                //             try_token = false;
-                //         }
-                //     }while(try_token);
-                // }
-                // catch(err) {
-                //     alert("No se pudo realizar la conexion con bioengine: " + err.message);
-                // }
-                // ------ Finalizar token  ------ //
-                // hr_employee.call('get_transaction_number',[self.employee.id]).done(function(response){
-                //     inTmpTransNum = self.validate_transaction_number(response, self.employee.id);
-                // });
-                // ------ Contruir transaccion ------ //
-                // do{
-                //     console.log('Construye numero de transaccion')
-                //     var res_obj = objBC.GetTmpTransNum(inToken, "", "", "");
-                //     if(res_obj == -1){
-                //         var try_again_num = confirm("No se pudo obtener la transacción de BioClient [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-                //             "Transacción es requerida para la operacion solicitada ¿Desea Reintentar?");
-                //         if (try_again_num === false){
-                //             try_trans_num = false;
-                //             return;
-                //         }
-                //     }
-                //     else{
-                //         try_trans_num = false;
-                //         inTmpTransNum = objBC.outTmpTransNum;
-                //     }
-                // }while(try_trans_num);
-                // ------ Finalizar transaccion ----- //
-                // ------ Comenzar dedos ------ //
-                // do{
-                    console.log('Comienza a registrar la imagen');
-                    // var res = objBC.CapturePic(inToken, inTmpTransNum, false, "FACE", "", "");
-                    // if (res == -1 || (res != -1 && objBC.outErrNum != "0")){
-                    //     var try_again_pic = confirm("No se pudo realizar la captura de fotogragfia [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-                    //         "La fotografia es requerida para el enrolamiento ¿Desea Reintentar?");
-                    //     if (try_again_pic === false){
-                    //         try_pic = false;
-                    //         return;
-                    //     }
-                    // }
-                    // else{
-                    //     try_pic = false;
-                    //     do {
-                    //         res = objBC.GetDataLocal(inToken, inTmpTransNum, "FACE", "", "", "");
-                    //         if (res == -1 ){
-                    //             var try_again_data_local = confirm("No se pudo obtener el dato [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
-                    //                 "¿Desea Reintentar?");
-                    //             if (try_again_data_local === false){
-                    //                 try_data_local = false;
-                    //                 return;
-                    //             }
-                    //         }
-                    //         else{
-                                console.log(position.coords.latitude);
-                                console.log(position.coords.longitude);                            
-                                // try_data_local = false;
-                                // picture = objBC.outData;
-                                hr_employee.call('attendance_action_change', [
-                                    [self.employee.id], position.coords.latitude, position.coords.longitude,
-                                ]).done(function (result) {
-                                    self.last_sign = new Date();
-                                    self.set({"signed_in": ! self.get("signed_in")});
-                                });
-                                // console.log('Capture pick - ' + picture);
-                    //         }
-                    //     }while(try_data_local);
-                    // }
-                // }while(try_pic);
+                // Se construye el token
+                try {
+                    console.log('Construye el token');
+                    do{
+                        objBC = new ActiveXObject("BioClient.clsBioClient");
+                        var res = objBC.GetToken("", "", "");
+                        inToken = objBC.outToken;
+                        if (res == -1){
+                            var try_again = confirm("No se pudo obtener token de BioEngine Client [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                                "Token es requerido para la aplicacion ¿Desea Reintentar?");
+                            if (try_again === false){
+                                try_token = false;
+                                return;
+                            }
+                        }
+                        else{
+                            try_token = false;
+                        }
+                    }while(try_token);
+                }
+                catch(err) {
+                    alert("No se pudo realizar la conexion con bioengine: " + err.message);
+                }
+                // Validamos el numero de transaccion
+                hr_employee.call('get_transaction_number',[self.employee.id]).done(function(response){
+                    inTmpTransNum = self.validate_transaction_number(response, self.employee.id);
+                });
+                // Solicitamos al usuario sus huellas dactilares
+                do{
+                    res = objBC.CaptureFinger(
+                        inToken,
+                        inTmpTransNum,
+                        true,
+                        false,
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        "",
+                        "");
+                    if (res == -1 || (res != -1 && objBC.outErrNum != "0")){
+                        var try_again_num = confirm("No se pudo capturar las huellas [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                            "Huellas son requeridas para el enrolamiento ¿Desea Reintentar?");
+                        if (try_again_num === false){
+                            try_fingers = false;
+                            return;
+                        }
+                    }
+                    else{
+                        try_fingers = false;
+                    }
+                }while(try_fingers);
+                // Enviamos paquete biometrico al servidor 
+                do{
+                    res = objBC.SendToServer(
+                        inToken,
+                        inTmpTransNum,
+                        "",
+                        "");
+                    if(res == -1){
+                            var try_again_sendtoserver = confirm("No se pudo enviar la informacion a bioengine server [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                                "Envio es Requerido para completar la operación ¿Desea Reintentar?");
+                            if (try_again_sendtoserver === false){
+                                try_send_toserver = false;
+                                return;
+                            }
+                        }else{
+                            try_send_toserver = false;  
+                        }
+                }while(try_send_toserver);
+                // Una vez enviada la informacion buscamos si existe algun guardado con el paquete biometrico anterior
+                do{
+                    res = objBC.ServerFind(inTmpTransNum, "", "", "", "");
+                    if (res == -1 || (res != -1 && objBC.outErrNum != "0"))
+                    {
+                        var try_again_find = confirm("No se pudo realizar la busqueda [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                                "La busqueda es requerida ¿Desea Reintentar?");
+                        if (try_again_find === false){
+                            try_find = false;
+                            return;
+                        }
+                    }else{
+                        try_find = false;
+                    }
+                }while(try_find);
+                inBioKey = objBC.outBioKey;
+                console.log('Server find - inBioKey: ' + objBC.outBioKey);
+                // Si la llave de bioengine nos devuelve vacio, quiere decir que el registro biometrico no existe y podemos enrolarlo
+                if (inBioKey !== '') {
+                    do{
+                        res = objBC.GetAppKey(
+                            inBioKey,
+                            'Bioflow HSBC',
+                            "",
+                            "",
+                            "");
+                        if (res == -1){
+                            var try_again_fing = confirm("No se pudo obtener el ID_APLICATIVO [" + objBC.outErrNum + "][" + objBC.outErrMsg + "]" +
+                                "¿Desea Reintentar?");
+                            if (try_again_fing === false){
+                                try_appkey = false;
+                                return;
+                            }
+                        }else{
+                            try_appkey = false;
+                        }
+                   }while(try_appkey);
+                    OutAppKey = objBC.OutAppKey;
+                    console.log('Get App key - OutAppKey: ' + objBC.OutAppKey);
+                    if (OutAppKey !== '') {
+                        hr_employee.call('search_res_partner',[OutAppKey]).done(function(response){
+                            // -- Cambia estatus cuando encuentra hit y registra la latitud y longitud de la asistencia -- //
+                            hr_employee.call('attendance_action_change', [
+                                [self.employee.id], position.coords.latitude, position.coords.longitude,
+                            ]).done(function (result) {
+                                self.last_sign = new Date();
+                                self.set({"signed_in": ! self.get("signed_in")});
+                            });
+                        });
+                    } else {
+                        alert('El usuario no se encuentra en el sistema');
+                    }
+                } else {
+                    alert('El usuario no esta dentor de la base de datos de bioengine');
+                }
             }else{
                 console.log('Cayo al else!');
                 self.set({"signed_in": ! self.get("signed_in")});
             }
-
-            // // ------ Finalizar dedos ----- //
           },
           error: function(error) {
             alert('Geolocation failed: '+error.message);

@@ -198,3 +198,11 @@ class hr_employee(osv.osv):
             context = {}
         employee = self.browse(cr, uid, employee_id, context=context)
         employee.bioflow_transaction = str(inTmpTransNum)
+
+    def search_res_partner(self, cr, uid, OutAppKey, context=None):
+        if context is None:
+            context = {}
+        import ipdb; ipdb.set_trace()
+        res_partner = self.search(cr, uid, [
+            ('address_home_id', '=', OutAppKey)])
+        return res_partner
