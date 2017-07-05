@@ -202,7 +202,6 @@ class hr_employee(osv.osv):
     def search_res_partner(self, cr, uid, OutAppKey, context=None):
         if context is None:
             context = {}
-        import ipdb; ipdb.set_trace()
         res_partner = self.search(cr, uid, [
             ('address_home_id', '=', OutAppKey)])
         return res_partner
