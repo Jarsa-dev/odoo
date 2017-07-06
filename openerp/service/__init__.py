@@ -7,6 +7,7 @@ import model
 import report
 import wsgi_server
 import server
+import telegram
 
 #.apidoc title: RPC Services
 
