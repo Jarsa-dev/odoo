@@ -4,68 +4,65 @@
 from openupgradelib import openupgrade
 
 SQL = (
-    "UPDATE ir_module_module SET latest_version='9.0.2.1.0', "
+    "UPDATE ir_module_module SET latest_version='10.0.0.0.0', "
     "state='to upgrade' WHERE name IN ('base_address_extended', "
-    "'base_address_city', 'analytic_operating_unit');")
+    "'base_address_city', 'l10n_mx_base');")
 
+SQL2 = (
+    "UPDATE ir_module_module SET state='to upgrade'"
+    "WHERE name IN ('web_enterprise', 'currency_rate_live', 'account_reports');")
+
+def change_vat(cr):
+    cr.execute('''
+        UPDATE res_partner
+        SET vat=substring(vat, 3)
+        WHERE vat ILIKE 'MX%';''')
+    cr.execute('''
+        UPDATE res_partner
+        SET vat=replace(vat, ' ', '')
+        WHERE vat ILIKE '% %';''')
+
+column_renames = {  
+    'account_journal': [
+        ('address_invoice_company_id', 'address_issued_id'),
+    ],
+    'account_invoice': [
+        ('sello', 'sello2'),
+        ('cfdi_sello', 'sello'),
+        ('cfdi_no_certificado', 'certificate_number'),
+        ('cfdi_cadena_original', 'cfdi_original_string'),
+        ('cfdi_fecha_timbrado', 'date_stamped'),
+        ('cfdi_fecha_cancelacion', 'cfdi_cancellation_date'),
+        ('cfdi_folio_fiscal', 'cfdi_uuid'),
+        ('invoice_sequence_id', 'sequence_id'),
+        ('pay_method_id', 'l10n_mx_payment_method_id'),
+        ('acc_payment', 'account_payment_id'),
+    ],
+}
+
+table_renames = [
+    ('pay_method', 'l10n_mx_payment_method'),
+]
+
+model_renames = [
+    ('pay.method', 'l10n_mx.payment.method'),
+]
 
 @openupgrade.migrate(use_env=True)
 def migrate(env, version):
-    env['ir.module.module'].update_list()
-    env['ir.module.module'].search([('name', '=', 'l10n_mx_base')]).unlink()
-    # MT Views
-    env.ref('comandos_invoice.report_xml_invoice_page').unlink()
-    env.ref('comandos_invoice.report_xml_invoice_header').unlink()
-    # OML Views
-    env.ref('oml.electronic_invoice_report_document').unlink()
-    env.ref('oml.external_layout').unlink()
-    env.ref('oml.external_layout_footer').unlink()
-    env.ref('oml.external_layout_header').unlink()
-    env.ref('oml.ir_sequence_form_oml').unlink()
-    env.ref('oml.l10n_mx_edi_addenda_autozone').unlink()
-    env.ref('oml.l10n_mx_edi_addenda_bosh_A_C').unlink()
-    env.ref('oml.res_partner_account_form_oml').unlink()
-    env.ref('oml.res_partner_address_form_oml').unlink()
-    env.ref('oml.res_partner_form_oml').unlink()
-    env.ref('oml.view_account_account_inherit_form').unlink()
-    env.ref('oml.view_account_addenda_form').unlink()
-    env.ref('oml.view_account_addenda_tree').unlink()
-    env.ref('oml.view_account_invoice_attachment_mx_supplier').unlink()
-    env.ref('oml.view_account_invoice_form_oml').unlink()
-    env.ref('oml.view_account_invoice_search_inh_oml').unlink()
-    env.ref('oml.view_account_invoice_supplier_form_inh_oml').unlink()
-    env.ref('oml.view_account_journal_view_form_inh_oml').unlink()
-    env.ref('oml.view_account_tax_category_form').unlink()
-    env.ref('oml.view_account_tax_category_form_inh').unlink()
-    env.ref('oml.view_account_tax_category_search').unlink()
-    env.ref('oml.view_account_tax_category_tree').unlink()
-    env.ref('oml.view_addenda_fields_form').unlink()
-    env.ref('oml.view_addenda_fields_tree').unlink()
-    env.ref('oml.view_country_state_city_form').unlink()
-    env.ref('oml.view_country_state_city_tree').unlink()
-    env.ref('oml.view_oml_account_tag_tree').unlink()
-    env.ref('oml.view_oml_acount_tag_form').unlink()
-    env.ref('oml.view_oml_payment_method_form').unlink()
-    env.ref('oml.view_oml_payment_method_tree').unlink()
-    env.ref('oml.view_partner_bank_clabe_form_inh_xml').unlink()
-    env.ref('oml.view_partner_bank_clabe_tree_inh_xml').unlink()
-    env.ref('oml.view_regimen_fiscal_form').unlink()
-    env.ref('oml.view_regimen_fiscal_tree').unlink()
-    env.ref('oml.view_res_bank_inherit_oml').unlink()
-    env.ref('oml.view_res_certificate_form').unlink()
-    env.ref('oml.view_res_certificate_search').unlink()
-    env.ref('oml.view_res_certificate_tree').unlink()
-    env.ref('oml.view_res_company_form_oml').unlink()
-    env.ref('oml.view_res_pac_form').unlink()
-    env.ref('oml.view_res_pac_search').unlink()
-    env.ref('oml.view_res_pac_tree').unlink()
-    env.ref('oml.view_wizard_update_fiscal_information_sat').unlink()
-    env.ref('oml.view_wizard_validate_invoice_uuid_sat').unlink()
-    env.ref('oml.view_wizard_xml_to_validate_line_sat').unlink()
+    # env['ir.module.module'].update_list()
+    # env['ir.module.module'].search([('name', '=', 'l10n_mx_base')]).unlink()
     env.cr.execute(SQL)
-    openupgrade.update_module_names(env.cr, [('oml', 'l10n_mx_base')])
-    env.cr.execute('''
-        UPDATE ir_module_module
-        SET latest_version='1.3'
-        WHERE name='base';
-        ''')
+    env.cr.execute(SQL2)
+    env.cr.execute("ALTER TABLE pay_method DROP CONSTRAINT pay_method_code_uniq;")
+    env.cr.execute("ALTER TABLE pay_method DROP CONSTRAINT pay_method_name_uniq;")
+    change_vat(env.cr)
+    openupgrade.rename_models(env.cr, model_renames)
+    openupgrade.rename_tables(env.cr, table_renames)
+    openupgrade.rename_columns(env.cr, column_renames)
+    # env.cr.execute('''
+    #     UPDATE ir_module_module
+    #     SET latest_version='1.3'
+    #     WHERE name='base';
+    #     ''')
+

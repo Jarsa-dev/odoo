@@ -794,6 +794,7 @@ class Partner(models.Model):
             args['company_name'] = ''
         elif self.commercial_company_name:
             address_format = '%(company_name)s\n' + address_format
+            import ipdb; ipdb.set_trace()
         return address_format % args
 
     def _display_address_depends(self):

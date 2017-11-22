@@ -12,6 +12,7 @@ model_renames = [
 ]
 
 
+
 @openupgrade.migrate(use_env=True)
 def migrate(env, version):
     openupgrade.rename_models(env.cr, model_renames)

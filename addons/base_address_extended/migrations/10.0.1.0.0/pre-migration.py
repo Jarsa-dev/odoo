@@ -8,6 +8,8 @@ column_renames = {
         ('l10n_mx_street3', 'street_number'),
         ('l10n_mx_street4', 'street_number2'),
         ('street', 'street_name'),
+        ('l10n_mx_city2', 'l10n_mx_locality'),
+        ('pay_method_id', 'l10n_mx_payment_method_id'),
     ]
 }
 
