@@ -14,4 +14,3 @@ def delete_views(cr):
 def migrate(env, version):
     env.cr.execute("DELETE FROM ir_model_data WHERE name='module_web_gantt';")
     delete_views(env.cr)
-

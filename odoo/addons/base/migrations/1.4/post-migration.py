@@ -22,7 +22,7 @@ def change_vat(cr):
         SET vat=replace(vat, ' ', '')
         WHERE vat ILIKE '% %';''')
 
-column_renames = {  
+column_renames = {
     'account_journal': [
         ('address_invoice_company_id', 'address_issued_id'),
     ],
@@ -50,7 +50,7 @@ model_renames = [
 
 @openupgrade.migrate(use_env=True)
 def migrate(env, version):
-    # env['ir.module.module'].update_list()
+    env['ir.module.module'].update_list()
     # env['ir.module.module'].search([('name', '=', 'l10n_mx_base')]).unlink()
     env.cr.execute(SQL)
     env.cr.execute(SQL2)
@@ -65,4 +65,3 @@ def migrate(env, version):
     #     SET latest_version='1.3'
     #     WHERE name='base';
     #     ''')
-
