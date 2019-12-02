@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import re
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import float_is_zero
@@ -13,7 +14,7 @@ class ReportAgedPartnerBalance(models.AbstractModel):
     _name = 'report.account.report_agedpartnerbalance'
     _description = 'Aged Partner Balance Report'
 
-    def _get_partner_move_lines(self, account_type, date_from, target_move, period_length):
+    def _get_partner_move_lines(self, account_type, date_from, target_move, period_length, currency = None):
         # This method can receive the context key 'include_nullified_amount' {Boolean}
         # Do an invoice and a payment and unreconcile. The amount will be nullified
         # By default, the partner wouldn't appear in this report.
@@ -25,6 +26,7 @@ class ReportAgedPartnerBalance(models.AbstractModel):
         # 61 - 90  : 2018-12-09 - 2018-11-10
         # 91 - 120 : 2018-11-09 - 2018-10-11
         # +120     : 2018-10-10
+
         ctx = self._context
         periods = {}
         date_from = fields.Date.from_string(date_from)
@@ -47,13 +49,23 @@ class ReportAgedPartnerBalance(models.AbstractModel):
         partner_clause = ''
         cr = self.env.cr
         user_company = self.env.user.company_id
-        user_currency = user_company.currency_id
+        user_currency = (
+            currency
+            if currency
+            else user_company.currency_id)
+
+        # Make sure that the currency is not a string, fixes error on line click
+        if isinstance(user_currency, str):
+            num = int(re.findall(r'\d+', user_curraency)[0])
+            user_currency = self.env['res.currency'].browse(num)
+
         company_ids = self._context.get('company_ids') or [user_company.id]
         move_state = ['draft', 'posted']
         if target_move == 'posted':
             move_state = ['posted']
         arg_list = (tuple(move_state), tuple(account_type))
-        #build the reconciliation clause to see what partner needs to be printed
+
+        # Build the reconciliation clause to see what partner needs to be printed
         reconciliation_clause = '(l.reconciled IS FALSE)'
         cr.execute('SELECT debit_move_id, credit_move_id FROM account_partial_reconcile where max_date > %s', (date_from,))
         reconciled_after_date = []
@@ -165,10 +177,12 @@ class ReportAgedPartnerBalance(models.AbstractModel):
         cr.execute(query, (tuple(move_state), tuple(account_type), date_from, tuple(partner_ids), date_from, tuple(company_ids)))
         aml_ids = cr.fetchall()
         aml_ids = aml_ids and [x[0] for x in aml_ids] or []
+        
         for line in self.env['account.move.line'].browse(aml_ids):
             partner_id = line.partner_id.id or False
             if partner_id not in undue_amounts:
                 undue_amounts[partner_id] = 0.0
+            # This is where we need to send the currency type, and where the value is returned.
             line_amount = line.company_id.currency_id._convert(line.balance, user_currency, user_company, date_from)
             if user_currency.is_zero(line_amount):
                 continue
