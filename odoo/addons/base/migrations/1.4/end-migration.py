@@ -72,13 +72,28 @@ def process_invoices(env):
             count = 0
             _logger.warning('Invoices processed %s of %s' % (
                 total_count, len(invoices)))
-    # _logger.warning('Update SAT Status to All Invoices')
-    # invoices.l10n_mx_edi_update_sat_status()
+    _logger.warning('Update SAT Status to All Invoices')
+    invoices.l10n_mx_edi_update_sat_status()
     _logger.warning('Failed Invoices: %s' % ','.join(failed))
+
+
+def process_tax_accounts(env):
+    """ Tax accounts must have reconcile = True when tax cash basis is
+    configured and you use multi currency
+    """
+    accounts = env['account.account']
+    taxes = env['account.tax'].search([('tax_exigibility', '=', 'on_payment')])
+    accounts |= taxes.mapped('account_id')
+    accounts |= taxes.mapped('refund_account_id')
+    accounts.write({
+        'reconcile': True,
+    })
 
 
 @openupgrade.migrate()
 def migrate(env, installed_version):
+    _logger.warning('Update tax cash basis tax account to reconciled')
+    process_tax_accounts(env)
     _logger.warning('Define l10n_mx_edi_decimal_places to 2')
     env.cr.execute('UPDATE res_currency SET l10n_mx_edi_decimal_places = 2;')
     openupgrade.delete_records_safely_by_xml_id(env, records_to_remove)
