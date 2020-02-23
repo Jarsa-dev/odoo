@@ -92,6 +92,9 @@ def process_tax_accounts(env):
 
 @openupgrade.migrate()
 def migrate(env, installed_version):
+    _logger.warning('Move report menu to correct account menu.')
+    env.ref('account.menu_finance_reports').parent_id = env.ref(
+        'account_accountant.menu_accounting').id
     _logger.warning('Update tax cash basis tax account to reconciled')
     process_tax_accounts(env)
     _logger.warning('Define l10n_mx_edi_decimal_places to 2')
