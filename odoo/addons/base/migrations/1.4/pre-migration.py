@@ -42,3 +42,16 @@ def migrate(env, installed_version):
     """)
     _logger.warning('Assign correct currency to Guinea-Bissauan')
     env.cr.execute('UPDATE res_country SET currency_id = 42 WHERE id = 93;')
+    _logger.warning('Remove duplicated SAT code 72101511')
+    env.cr.execute(
+        'DELETE FROM l10n_mx_edi_product_sat_code WHERE id = 54572;')
+    _logger.warning('Remove SAT Codes external id and regenerate the updated')
+    env.cr.execute(
+        "DELETE FROM ir_model_data WHERE name LIKE 'l10n_mx_edi_sat_code_%';")
+    env.cr.execute("""
+        INSERT INTO ir_model_data
+        (name, res_id, module, model)
+        SELECT concat('prod_code_sat_', code), id, 'l10n_mx_edi',
+        'l10n_mx_edi.product.sat.code'
+        FROM l10n_mx_edi_product_sat_code;
+    """)
