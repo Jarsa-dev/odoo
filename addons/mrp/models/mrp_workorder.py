@@ -422,6 +422,7 @@ class MrpWorkorder(models.Model):
 
         if float_compare(self.qty_produced, self.production_id.product_qty, precision_rounding=rounding) >= 0:
             self.button_finish()
+        self.production_id.post_inventory()
         return True
 
     def _get_byproduct_move_to_update(self):

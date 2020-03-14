@@ -376,6 +376,7 @@ class StockMoveLine(models.Model):
         # the line. It is mandatory in order to free the reservation and correctly apply
         # `action_done` on the next move lines.
         ml_to_delete = self.env['stock.move.line']
+        import ipdb; ipdb.set_trace()
         for ml in self:
             # Check here if `ml.qty_done` respects the rounding of `ml.product_uom_id`.
             uom_qty = float_round(ml.qty_done, precision_rounding=ml.product_uom_id.rounding, rounding_method='HALF-UP')
