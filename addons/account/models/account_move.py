@@ -1660,7 +1660,7 @@ class AccountPartialReconcile(models.Model):
             # The move date should be the maximum date between payment and invoice (in case
             # of payment in advance). However, we should make sure the move date is not
             # recorded before the period lock date as the tax statement for this period is
-            # probably already sent to the estate.
+            # probably already sent to the estate..
             newly_created_move.write({'date': move_date})
 
     def _get_tax_cash_basis_base_key(self, tax, move, line):
