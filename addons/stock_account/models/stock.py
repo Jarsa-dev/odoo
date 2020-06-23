@@ -271,33 +271,39 @@ class StockMove(models.Model):
 
         # Find back incoming stock moves (called candidates here) to value this move.
         qty_to_take_on_candidates = quantity or valued_quantity
-        candidates = move.product_id._get_fifo_candidates_in_move_with_company(move.company_id.id)
+        candidates = move.product_id.with_context(move=move)._get_fifo_candidates_in_move_with_company(move.company_id.id)
         new_standard_price = 0
         tmp_qty = 0
         tmp_value = 0  # to accumulate the value taken on the candidates
-        for candidate in candidates:
-            new_standard_price = candidate.price_unit
-            if candidate.remaining_qty <= qty_to_take_on_candidates:
-                qty_taken_on_candidate = candidate.remaining_qty
-            else:
-                qty_taken_on_candidate = qty_to_take_on_candidates
+        for line in valued_move_lines:
+            qty_to_take = line.product_uom_id._compute_quantity(line.qty_done, move.product_id.uom_id)
+            for candidate in candidates:
+                if move.product_id.tracking != 'lot':
+                    pass
+                elif candidate.mapped('move_line_ids.lot_id') not in line.mapped('lot_id'):
+                    continue
+                new_standard_price = candidate.price_unit
+                if candidate.remaining_qty <= qty_to_take:
+                    qty_taken_on_candidate = candidate.remaining_qty
+                else:
+                    qty_taken_on_candidate = qty_to_take
 
-            # As applying a landed cost do not update the unit price, naivelly doing
-            # something like qty_taken_on_candidate * candidate.price_unit won't make
-            # the additional value brought by the landed cost go away.
-            candidate_price_unit = candidate.remaining_value / candidate.remaining_qty
-            value_taken_on_candidate = qty_taken_on_candidate * candidate_price_unit
-            candidate_vals = {
-                'remaining_qty': candidate.remaining_qty - qty_taken_on_candidate,
-                'remaining_value': candidate.remaining_value - value_taken_on_candidate,
-            }
-            candidate.write(candidate_vals)
+                # As applying a landed cost do not update the unit price, naivelly doing
+                # something like qty_taken_on_candidate * candidate.price_unit won't make
+                # the additional value brought by the landed cost go away.
+                candidate_price_unit = candidate.remaining_value / candidate.remaining_qty
+                value_taken_on_candidate = qty_taken_on_candidate * candidate_price_unit
+                candidate_vals = {
+                    'remaining_qty': candidate.remaining_qty - qty_taken_on_candidate,
+                    'remaining_value': candidate.remaining_value - value_taken_on_candidate,
+                }
+                candidate.write(candidate_vals)
 
-            qty_to_take_on_candidates -= qty_taken_on_candidate
-            tmp_qty += qty_taken_on_candidate
-            tmp_value += value_taken_on_candidate
-            if qty_to_take_on_candidates == 0:
-                break
+                qty_to_take_on_candidates -= qty_taken_on_candidate
+                tmp_qty += qty_taken_on_candidate
+                tmp_value += value_taken_on_candidate
+                if qty_to_take_on_candidates == 0:
+                    break
 
         # Update the standard price with the price of the last used candidate, if any.
         if new_standard_price and move.product_id.cost_method == 'fifo':

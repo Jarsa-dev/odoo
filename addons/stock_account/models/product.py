@@ -182,6 +182,9 @@ class ProductProduct(models.Model):
     def _get_fifo_candidates_in_move_with_company(self, move_company_id=False):
         self.ensure_one()
         domain = [('product_id', '=', self.id), ('remaining_qty', '>', 0.0)] + self.env['stock.move']._get_in_base_domain(move_company_id)
+        move = self._context.get('move', False)
+        if move and move.product_id.tracking == 'lot':
+            domain += [('move_line_ids.lot_id', 'in', move.mapped('move_line_ids.lot_id').ids)]
         candidates = self.env['stock.move'].search(domain, order='date, id')
         return candidates
 
