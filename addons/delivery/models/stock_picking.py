@@ -76,7 +76,7 @@ class StockPicking(models.Model):
             package.weight_uom_name = self.env['product.template']._get_weight_uom_name_from_ir_config_parameter()
 
     carrier_price = fields.Float(string="Shipping Cost")
-    delivery_type = fields.Selection(related='carrier_id.delivery_type', readonly=True)
+    #delivery_type = fields.Selection(related='carrier_id.delivery_type', readonly=True)
     carrier_id = fields.Many2one("delivery.carrier", string="Carrier", check_company=True)
     volume = fields.Float(copy=False, digits='Volume')
     weight = fields.Float(compute='_cal_weight', digits='Stock Weight', store=True, help="Total weight of the products in the picking.", compute_sudo=True)

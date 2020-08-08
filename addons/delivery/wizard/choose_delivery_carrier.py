@@ -17,7 +17,7 @@ class ChooseDeliveryCarrier(models.TransientModel):
         help="Choose the method to deliver your goods",
         required=True,
     )
-    delivery_type = fields.Selection(related='carrier_id.delivery_type')
+    #delivery_type = fields.Selection(related='carrier_id.delivery_type')
     delivery_price = fields.Float()
     display_price = fields.Float(string='Cost', readonly=True)
     currency_id = fields.Many2one('res.currency', related='order_id.currency_id')
