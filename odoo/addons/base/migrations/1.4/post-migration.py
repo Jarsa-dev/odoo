@@ -1,4 +1,4 @@
-# Copyright 2016 Jarsa Sistemas, S.A. de C.V.
+# Copyright 2021 TECMUR S.A. de C.V.
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 import logging
@@ -10,9 +10,14 @@ _logger = logging.getLogger(__name__)
 to_remove = [
     'cost_margin_utility_report',
     'l10n_mx_edi_bank',
+    'l10n_mx_edi_cancellation_complement',
     'stock_inventory_valuation_location',
     'stock_kardex_report',
-    'tecmur_security',
+]
+
+to_install = [
+    'stock_account_by_lot',
+    'role_policy',
 ]
 
 
@@ -35,10 +40,12 @@ def rename_modules(env, old, new):
 
 @openupgrade.migrate()
 def migrate(env, installed_version):
-    import ippp;
     rename_modules(
         env, 'bo_import_direct_drive_sheet', 'google_spreadsheet_import')
     env['ir.module.module'].update_list()
+    modules_to_install = env['ir.module.module'].search([
+        ('name', 'in', to_install)])
+    modules_to_install.button_install()
     modules_to_remove = env['ir.module.module'].search([
         ('name', 'in', to_remove)])
     modules_to_remove += modules_to_remove.downstream_dependencies()
