@@ -9,8 +9,13 @@ _logger = logging.getLogger(__name__)
 
 @openupgrade.migrate()
 def migrate(env, installed_version):
-    _logger.warning('Removing bank accounts with no partner')
     env.cr.execute("""
         ALTER TABLE base_external_dbsource
         ALTER COLUMN connector DROP NOT NULL;
+    """)
+    _logger.warning('Set company id in stock.move.line')
+    env.cr.execute("""
+        UPDATE stock_move_line
+        SET company_id = 1
+        WHERE company_id IS NULL;
     """)

@@ -20,6 +20,23 @@ to_install = [
     'role_policy',
 ]
 
+models_to_rename = [
+    ('google.drive.file', 'google.spreadsheet.file'),
+    ('google.drive.file.sheet', 'google.spreadsheet.file.sheet'),
+    ('google.drive.file.model', 'google.spreadsheet.file.model'),
+    ('google.drive.sheet', 'google.spreadsheet'),
+    ('google.drive.sheet.error', 'google.spreadsheet.error'),
+]
+
+tables_to_rename = [
+    ('google_drive_file', 'google_spreadsheet_file'),
+    ('google_drive_file_sheet', 'google_spreadsheet_file_sheet'),
+    ('google_drive_file_model', 'google_spreadsheet_file_model'),
+    ('google_drive_sheet', 'google_spreadsheet'),
+    ('google_drive_sheet_error', 'google_spreadsheet_error'),
+
+]
+
 
 def rename_modules(env, old, new):
     env['ir.module.module'].update_list()
@@ -40,6 +57,8 @@ def rename_modules(env, old, new):
 
 @openupgrade.migrate()
 def migrate(env, installed_version):
+    openupgrade.rename_models(env.cr, models_to_rename)
+    openupgrade.rename_tables(env.cr, tables_to_rename)
     rename_modules(
         env, 'bo_import_direct_drive_sheet', 'google_spreadsheet_import')
     env['ir.module.module'].update_list()

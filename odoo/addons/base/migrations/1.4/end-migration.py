@@ -28,8 +28,7 @@ def migrate(env, installed_version):
         name in (
         'stock.picking.view.form.custom.date',
         'stock.picking.by.partner.tecmur.form',
-        'stock.picking.tecmur.form',
-        )
+        'stock.picking.tecmur.form')
         AND
         model = 'stock.picking'
         AND
@@ -40,31 +39,31 @@ def migrate(env, installed_version):
         SET active = True
         WHERE
         name in (
-        'mrp.production.by.lot.inherit.tecmur.form',
+        'mrp.production.by.lot.inherit.tecmur.form'
         )
         AND
         model = 'mrp.production'
         AND
         inherit_id = 1270;
     """)
-    env.cr.execute("""
-        UPDATE account_move
-        SET authorized = True
-        WHERE name
-        IN
-        (
-        SELECT move_name
-        FROM account_invoice
-        WHERE authorized = True
-        AND
-        type = 'in_invoice'
-        );
-    """)
-    env.cr.execute("""
-        UPDATE account_move
-        SET authorized = False
-        WHERE authorized IS NULL
-        AND
-        type = 'in_invoice';
-    """)
+    # env.cr.execute("""
+    #     UPDATE account_move
+    #     SET authorized = True
+    #     WHERE name
+    #     IN
+    #     (
+    #     SELECT move_name
+    #     FROM account_invoice
+    #     WHERE authorized = True
+    #     AND
+    #     type = 'in_invoice'
+    #     );
+    # """)
+    # env.cr.execute("""
+    #     UPDATE account_move
+    #     SET authorized = False
+    #     WHERE authorized IS NULL
+    #     AND
+    #     type = 'in_invoice';
+    # """)
     os.system('say el script de migración ha concluido')
