@@ -2106,7 +2106,6 @@ class IrModelData(models.Model):
                 constraint_ids.append(data.res_id)
             else:
                 records_items.append((data.model, data.res_id))
-
         # avoid prefetching fields that are going to be deleted: during uninstall, it is
         # possible to perform a recompute (via flush_env) after the database columns have been
         # deleted but before the new registry has been created, meaning the recompute will
