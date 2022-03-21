@@ -7,6 +7,31 @@ from openupgradelib import openupgrade
 _logger = logging.getLogger(__name__)
 
 
+map_payment_methods = [
+    ("payment_method_efectivo", "payment_method_efectivo"),
+    ("payment_method_cheque", "payment_method_cheque"),
+    ("payment_method_transferencia", "payment_method_transferencia"),
+    ("payment_method_tarjeta_de_credito", "payment_method_tarjeta_de_credito"),
+    ("payment_method_monedero_electronico", "payment_method_monedero_electronico"),
+    ("payment_method_dinero_electronico", "payment_method_dinero_electronico"),
+    ("payment_method_vales_despensa", "payment_method_vales_despensa"),
+    ("payment_method_12", "payment_method_12"),
+    ("payment_method_13", "payment_method_13"),
+    ("payment_method_14", "payment_method_14"),
+    ("payment_method_15", "payment_method_15"),
+    ("payment_method_17", "payment_method_17"),
+    ("payment_method_23", "payment_method_23"),
+    ("payment_method_24", "payment_method_24"),
+    ("payment_method_25", "payment_method_25"),
+    ("payment_method_26", "payment_method_26"),
+    ("payment_method_27", "payment_method_27"),
+    ("payment_method_tarjeta_debito", "payment_method_tarjeta_debito"),
+    ("payment_method_tarjeta_servicio", "payment_method_tarjeta_servicio"),
+    ("payment_method_30", "payment_method_anticipos"),
+    ("payment_method_otros", "payment_method_otros"),
+]
+
+
 def fix_sat_codes(env):
     _logger.warning('Change SAT codes external ids')
     env.cr.execute("""
@@ -24,7 +49,6 @@ def fix_partner_fields(env):
         WHERE l10n_mx_locality IS NOT NULL;
     """)
 
-
 def remove_l10n_mx_base_data(env):
     env.cr.execute("""
         SELECT id
@@ -32,10 +56,6 @@ def remove_l10n_mx_base_data(env):
         WHERE module = 'l10n_mx_base' AND model = 'ir.model.access';
     """)
     access_ids = [x[0] for x in env.cr.fetchall()]
-    env.cr.execute("""
-        DELETE FROM ir_model_access
-        WHERE group_id IN (47);
-    """)
     env.cr.execute("""
         DELETE FROM ir_model_access
         WHERE id IN %(ids)s;
@@ -104,20 +124,6 @@ def migrate(env, installed_version):
     env.cr.execute("""
         DELETE FROM account_account_type
         WHERE internal_group IS NULL;
-    """)
-    env.cr.execute("""
-        SELECT id
-        FROM ir_ui_view
-        WHERE inherit_id IN (465, 474, 381, 386, 373, 394, 421, 406, 55, 111, 135, 123, 131, 132, 124, 129, 335, 333, 748, 750, 351, 2781, 2721, 2504, 595, 719, 340, 718, 793, 572, 2538, 3383, 3384, 2874, 278, 916, 1909, 1902);
-    """)
-    view_ids = [x[0] for x in env.cr.fetchall()]
-    env.cr.execute("""
-        DELETE FROM ir_ui_view
-        WHERE id IN %(ids)s;
-    """, {'ids': tuple(view_ids)})
-    env.cr.execute("""
-        DELETE FROM ir_ui_view
-        WHERE id IN (465, 474, 381, 386, 373, 394, 421, 406, 55, 111, 135, 123, 131, 132, 124, 129, 335, 333, 748, 750);
     """)
     _logger.warning('Remove l10n_mx_base data')
     remove_l10n_mx_base_data(env)

@@ -40,6 +40,11 @@ modules_remove_views = [
     'l10n_mx_base',
 ]
 
+# List of modules to remove all security rules, access and groups.
+modules_remove_security = [
+    'l10n_mx_base',
+]
+
 # List of strings with XML ID.
 records_to_remove = []
 
@@ -102,9 +107,9 @@ def rename_modules(env, old, new):
 def remove_module_views(env, module_list):
     def recursive_inherit_ids(records):
         env.cr.execute("""
-            SELECT inherit_id AS id
+            SELECT id
             FROM ir_ui_view
-            WHERE id IN %(ids)s AND inherit_id IS NOT NULL;
+            WHERE inherit_id IN %(ids)s;
         """, {'ids': tuple(records.mapped('res_id'))})
         res = env.cr.fetchall()
         view_ids = [x[0] for x in res]
@@ -124,25 +129,60 @@ def remove_module_views(env, module_list):
     return records.mapped('complete_name')
 
 
+def remove_module_security(env, module_list):
+    recs = env['ir.model.data'].search([
+        ('model', '=', 'ir.model.access'),
+        ('module', 'in', module_list),
+    ])
+    access = env['ir.model.access'].browse(recs.mapped('res_id'))
+    access.unlink()
+    recs = env['ir.model.data'].search([
+        ('model', '=', 'ir.rule'),
+        ('module', 'in', module_list),
+    ])
+    rules = env['ir.rule'].browse(recs.mapped('res_id'))
+    rules.unlink()
+    recs = env['ir.model.data'].search([
+        ('model', '=', 'res.groups'),
+        ('module', 'in', module_list),
+    ])
+    groups = env['res.groups'].browse(recs.mapped('res_id'))
+    access = env['ir.model.access'].search([
+        ('group_id', 'in', groups.ids)
+    ])
+    access.unlink()
+    groups.unlink()
+
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
-    _logger.warning('Delete records from XML ID')
-    openupgrade.delete_records_safely_by_xml_id(env, records_to_remove)
-    openupgrade.delete_records_safely_by_xml_id(
-        env, remove_module_views(env, modules_remove_views))
-    for module in modules_to_rename:
-        rename_modules(env, module[0], module[1])
-    openupgrade.rename_models(env.cr, models_to_rename)
-    openupgrade.rename_tables(env.cr, tables_to_rename)
-    openupgrade.rename_fields(env, fields_to_rename)
-    env['ir.module.module'].update_list()
-    _logger.warning('Installing new modules')
-    modules_to_install = env['ir.module.module'].search([
-        ('name', 'in', to_install)])
-    modules_to_install.button_install()
-    _logger.warning('Uninstalling not required modules')
-    modules_to_remove = env['ir.module.module'].search([
-        ('name', 'in', to_remove)])
-    modules_to_remove += modules_to_remove.downstream_dependencies()
-    modules_to_remove.module_uninstall()
-    modules_to_remove.unlink()
+    if records_to_remove:
+        _logger.warning('Delete records from XML ID')
+        openupgrade.delete_records_safely_by_xml_id(env, records_to_remove)
+    if modules_remove_views:
+        openupgrade.delete_records_safely_by_xml_id(
+            env, remove_module_views(env, modules_remove_views))
+    if modules_remove_security:
+        remove_module_security(env, modules_remove_security)
+    if modules_to_rename:
+        for module in modules_to_rename:
+            rename_modules(env, module[0], module[1])
+    if models_to_rename:
+        openupgrade.rename_models(env.cr, models_to_rename)
+    if tables_to_rename:
+        openupgrade.rename_tables(env.cr, tables_to_rename)
+    if fields_to_rename:
+        openupgrade.rename_fields(env, fields_to_rename)
+    if to_install:
+        env['ir.module.module'].update_list()
+        _logger.warning('Installing new modules')
+        modules_to_install = env['ir.module.module'].search([
+            ('name', 'in', to_install)])
+        modules_to_install.button_install()
+    if to_remove:
+        _logger.warning('Uninstalling not required modules')
+        modules_to_remove = env['ir.module.module'].search([
+            ('name', 'in', to_remove)])
+        modules_to_remove += modules_to_remove.downstream_dependencies()
+        modules_to_remove.module_uninstall()
+        modules_to_remove.unlink()
