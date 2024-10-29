@@ -14,6 +14,7 @@ to_install = [
 # List of modules to remove (uninstall)
 to_remove = [
     "account_invoice_automatic_landed_costs",
+    "purchase_invoice_line_zero",
 ]
 
 # List of modules to remove all views.
