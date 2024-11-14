@@ -15,6 +15,7 @@ to_install = [
 to_remove = [
     "account_invoice_automatic_landed_costs",
     "purchase_invoice_line_zero",
+    "purchase_request_notify_tecmur",
 ]
 
 # List of modules to remove all views.
