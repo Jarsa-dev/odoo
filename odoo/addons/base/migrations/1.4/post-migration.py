@@ -9,13 +9,11 @@ _logger = logging.getLogger(__name__)
 
 # List of modules to install
 to_install = [
+    "queue_job",
 ]
 
 # List of modules to remove (uninstall)
 to_remove = [
-    "account_invoice_automatic_landed_costs",
-    "purchase_invoice_line_zero",
-    "purchase_request_notify_tecmur",
 ]
 
 # List of modules to remove all views.
@@ -49,8 +47,14 @@ fields_to_rename = [
 # List of tuples with the follwing format
 # ('old_module_name', 'new_module_name'),
 modules_to_rename = [
+    ("mass_editing", "server_action_mass_edit"),
 ]
 
+external_ids_to_remove = [
+    "account_invoice_automatic_landed_costs.journal_prorate",
+    "account_invoice_automatic_landed_costs.product_product_prorate_product_template",
+    "account_invoice_automatic_landed_costs.product_product_prorate",
+]
 
 def rename_modules(env, old, new):
     env['ir.module.module'].update_list()
@@ -60,7 +64,7 @@ def rename_modules(env, old, new):
         [('name', '=', new)])
     old_module = env['ir.module.module'].search(
         [('name', '=', old)])
-    module.invalidate_cache()
+    module.invalidate_recordset()
     if module and old_module:
         env.cr.execute(
             "DELETE FROM ir_model_data WHERE name = 'module_%s'" % new)
@@ -145,7 +149,7 @@ def migrate(env, installed_version):
         _logger.warning('Fields to rename')
         openupgrade.rename_fields(env, fields_to_rename)
     if to_install:
-        env['ir.module.module'].update_list()
+        # env['ir.module.module'].update_list()
         _logger.warning('Installing new modules')
         modules_to_install = env['ir.module.module'].search([
             ('name', 'in', to_install)])
@@ -157,3 +161,12 @@ def migrate(env, installed_version):
         modules_to_remove += modules_to_remove.downstream_dependencies()
         modules_to_remove.module_uninstall()
         modules_to_remove.unlink()
+    if external_ids_to_remove:
+        _logger.warning('Removing external IDs')
+        for external_id in external_ids_to_remove:
+            module, external_id = external_id.split('.')
+            _logger.warning('Removing external ID: %s.%s', module, external_id)
+            env['ir.model.data'].search([
+                ('module', '=', module),
+                ('name', '=', external_id)
+            ]).unlink()
