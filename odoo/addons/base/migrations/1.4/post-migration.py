@@ -48,6 +48,8 @@ fields_to_rename = [
 # ('old_module_name', 'new_module_name'),
 modules_to_rename = [
     ("mass_editing", "server_action_mass_edit"),
+    ("report_acount_invoice_tecmur", "report_account_invoice_tecmur"),
+    ("report_acount_payment_tecmur","report_account_payment_tecmur"),
 ]
 
 external_ids_to_remove = [
