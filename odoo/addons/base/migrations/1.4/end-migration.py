@@ -148,6 +148,7 @@ def migrate(env, installed_version):
         modules_to_remove.module_uninstall()
         modules_to_remove.unlink()
     _process_stock_valuation_layer(env)
+    env["purchase.request"].search([]).write({"is_name_editable": False})
     env.cr.execute("""
         UPDATE ir_module_module
         SET
