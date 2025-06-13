@@ -26,6 +26,7 @@ modules_remove_security = [
 
 # List of strings with XML ID.
 records_to_remove = [
+    "crm.crm_team_view_kanban_dashboard",
 ]
 
 # List of tuples with the following format
