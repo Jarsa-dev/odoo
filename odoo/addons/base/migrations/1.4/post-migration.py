@@ -9,7 +9,6 @@ _logger = logging.getLogger(__name__)
 
 # List of modules to install
 to_install = [
-    "queue_job",
 ]
 
 # List of modules to remove (uninstall)
@@ -42,20 +41,15 @@ tables_to_rename = [
 # List of tuples with the following format
 # ('model.name', 'table_name', 'old_field', 'new_field'),
 fields_to_rename = [
+    ("product.product", "product_product", "x_studio_product_review", "product_review"),
 ]
 
 # List of tuples with the follwing format
 # ('old_module_name', 'new_module_name'),
 modules_to_rename = [
-    ("mass_editing", "server_action_mass_edit"),
-    ("report_acount_invoice_tecmur", "report_account_invoice_tecmur"),
-    ("report_acount_payment_tecmur","report_account_payment_tecmur"),
 ]
 
 external_ids_to_remove = [
-    "account_invoice_automatic_landed_costs.journal_prorate",
-    "account_invoice_automatic_landed_costs.product_product_prorate_product_template",
-    "account_invoice_automatic_landed_costs.product_product_prorate",
 ]
 
 def rename_modules(env, old, new):
