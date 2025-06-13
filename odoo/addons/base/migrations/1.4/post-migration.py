@@ -53,6 +53,12 @@ modules_to_rename = [
 external_ids_to_remove = [
 ]
 
+# List of tuples with the following format
+# ('model.name', 'field_name')
+views_to_delete_by_model_field = [
+    ("account.analytic.line", "operating_unit_id"),
+]
+
 def rename_modules(env, old, new):
     env['ir.module.module'].update_list()
     _logger.warning(
@@ -120,6 +126,29 @@ def remove_module_security(env, module_list):
     groups.unlink()
 
 
+def delete_views_with_model_field(env, views_to_delete_by_model_field):
+    """
+    Delete views that have a specific model and field.
+    :param env: Odoo environment
+    :param views_to_delete_by_model_field: List of tuples with the format
+        ('model.name', 'field_name')
+    """
+    for model, field in views_to_delete_by_model_field:
+        _logger.warning('Deleting views for model %s with field %s', model, field)
+        env.cr.execute("""
+            SELECT id
+            FROM ir_ui_view
+            WHERE EXISTS (
+                SELECT 1
+                FROM jsonb_each_text(arch_db) AS langs(lang, xml)
+                WHERE xml ILIKE %(field)s
+            )
+            and model = %(model)s
+        """, {'model': model, 'field': f'%{field}%'})
+        view_ids = [x[0] for x in env.cr.fetchall()]
+        if view_ids:
+            _logger.warning('Deleting views with ids %s', view_ids)
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
     if records_to_remove:
@@ -158,6 +187,9 @@ def migrate(env, installed_version):
         modules_to_remove += modules_to_remove.downstream_dependencies()
         modules_to_remove.module_uninstall()
         modules_to_remove.unlink()
+    if views_to_delete_by_model_field:
+        _logger.warning('Deleting views by model and field')
+        delete_views_with_model_field(env, views_to_delete_by_model_field)
     if external_ids_to_remove:
         _logger.warning('Removing external IDs')
         for external_id in external_ids_to_remove:
