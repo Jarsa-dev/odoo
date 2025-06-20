@@ -56,6 +56,33 @@ modules_to_rename = [
 external_ids_to_remove = [
 ]
 
+assets_to_remove = [
+    "account_analytic_tag_assign.static.src.js.form_widgets.js",
+    "/tpv_analytic_account_isolation/static/src/js/tpv_analytic_user_bar.js",
+    "/date_range/static/src/js/date_range.js",
+    "/report_xlsx/static/src/js/report/action_manager_report.js",
+    "/base_tier_validation/static/src/js/systray.js",
+    "/base_tier_validation/static/src/js/tier_review_widget.js",
+    "/mail_tracking/static/src/js/mail_tracking.js",
+    "/mail_tracking/static/src/js/failed_message/discuss.js",
+    "/mail_tracking/static/src/js/failed_message/thread.js",
+    "/mis_builder/static/src/js/mis_report_widget.js",
+    "/l10n_mx_edi_vendor_bills/static/src/js/attach_xmls.js",
+    "/web_timeline/static/lib/vis/vis-timeline-graph2d.min.js",
+    "/web_timeline/static/src/js/timeline_view.js",
+    "/web_timeline/static/src/js/timeline_renderer.js",
+    "/web_timeline/static/src/js/timeline_controller.js",
+    "/web_timeline/static/src/js/timeline_model.js",
+    "/web_timeline/static/src/js/timeline_canvas.js",
+    "/web_widget_color/static/lib/jscolor/jscolor.js",
+    "/web_widget_color/static/src/js/widget.js",
+    "/base_tier_validation/static/src/scss/systray.scss",
+    "/base_tier_validation/static/src/scss/review.scss",
+    "/mail_tracking/static/src/css/mail_tracking.scss",
+    "/mail_tracking/static/src/css/failed_message.scss",
+    "/mis_builder/static/src/css/custom.css",
+]
+
 
 def rename_modules(env, old, new):
     env['ir.module.module'].update_list()
@@ -173,3 +200,8 @@ def migrate(env, installed_version):
             ]).unlink()
     _logger.warning('Removing ir_config_parameter l10n_mx_partner_blocklist_url_not_located')
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'l10n_mx_partner_blocklist_url_not_located';")
+    if assets_to_remove:
+        _logger.warning('Removing ir_assets')
+        for asset in assets_to_remove:
+            _logger.warning('Removing ir_asset for %s', asset)
+            env.cr.execute("DELETE FROM ir_asset WHERE path = %(asset)s;", {'asset': asset})
