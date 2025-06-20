@@ -57,7 +57,7 @@ external_ids_to_remove = [
 ]
 
 assets_to_remove = [
-    "account_analytic_tag_assign.static.src.js.form_widgets.js",
+    "/account_analytic_tag_assign/static/src/js/form_widgets.js",
     "/tpv_analytic_account_isolation/static/src/js/tpv_analytic_user_bar.js",
     "/date_range/static/src/js/date_range.js",
     "/report_xlsx/static/src/js/report/action_manager_report.js",

@@ -17,7 +17,6 @@ to_remove = [
     "l10n_mx_edi_uuid_zip",
     "sale_subscription_operating_unit",
     "account_cash_basis_mix_currency_fix",
-    "mis_builder",
     "partner_group",
     "mail_restrict_follower_selection",
     "account_tax_cash_basis_reference",
