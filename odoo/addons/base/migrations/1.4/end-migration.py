@@ -29,6 +29,11 @@ records_to_remove = [
 ]
 
 
+views_to_activate = [
+    "purchase_operating_unit.purchase_order_form",
+]
+
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
     if records_to_remove:
@@ -41,6 +46,14 @@ def migrate(env, installed_version):
         modules_to_remove += modules_to_remove.downstream_dependencies()
         modules_to_remove.module_uninstall()
         modules_to_remove.unlink()
+    if views_to_activate:
+        _logger.warning('Activating views')
+        for view in views_to_activate:
+            view_record = env.ref(view, raise_if_not_found=False)
+            if view_record:
+                view_record.active = True
+            else:
+                _logger.warning(f'View {view} not found')
     env.cr.execute("""
         UPDATE ir_module_module
         SET
