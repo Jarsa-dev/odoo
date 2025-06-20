@@ -11,6 +11,11 @@ _logger = logging.getLogger(__name__)
 
 
 to_remove = [
+    "l10n_mx_edi_partner_defaults",
+    "l10n_mx_edi_statement_cancellation",
+    "l10n_mx_edi_uuid",
+    "l10n_mx_edi_uuid_zip",
+    "sale_subscription_operating_unit",
 ]
 
 

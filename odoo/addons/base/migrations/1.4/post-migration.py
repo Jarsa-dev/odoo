@@ -171,3 +171,5 @@ def migrate(env, installed_version):
                 ('module', '=', module),
                 ('name', '=', external_id)
             ]).unlink()
+    _logger.warning('Removing ir_config_parameter l10n_mx_partner_blocklist_url_not_located')
+    env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'l10n_mx_partner_blocklist_url_not_located';")
