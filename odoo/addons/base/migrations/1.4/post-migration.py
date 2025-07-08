@@ -200,6 +200,9 @@ def migrate(env, installed_version):
             ]).unlink()
     _logger.warning('Removing ir_config_parameter l10n_mx_partner_blocklist_url_not_located')
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'l10n_mx_partner_blocklist_url_not_located';")
+    _logger.warning('Updating res_partner l10n_mx_edi_usage and l10n_mx_edi_supplier_usage from P01 to G03')
+    env.cr.execute("UPDATE res_partner SET l10n_mx_edi_usage = 'G03' WHERE l10n_mx_edi_usage = 'P01';")
+    env.cr.execute("UPDATE res_partner SET l10n_mx_edi_supplier_usage = 'G03' WHERE l10n_mx_edi_supplier_usage = 'P01';")
     if assets_to_remove:
         _logger.warning('Removing ir_assets')
         for asset in assets_to_remove:
