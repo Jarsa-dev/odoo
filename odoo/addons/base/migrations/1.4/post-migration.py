@@ -10,6 +10,7 @@ _logger = logging.getLogger(__name__)
 # List of modules to install
 to_install = [
     "hr_timesheet_operating_unit",
+    "stock_analytic",
 ]
 
 # List of modules to remove (uninstall)
