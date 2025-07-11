@@ -32,16 +32,19 @@ records_to_remove = [
 # List of tuples with the following format
 # ('old.model.name', 'new.model.name'),
 models_to_rename = [
+    ("product.template.tag", "product.tag"),
 ]
 
 # List of tuples with the following format
 # ('old_table_name', 'new_table_name'),
 tables_to_rename = [
+    ("product_template_tag", "product_tag"),
 ]
 
 # List of tuples with the following format
 # ('model.name', 'table_name', 'old_field', 'new_field'),
 fields_to_rename = [
+    ("product.templte", "product_template", "tag_ids", "product_tag_ids")
 ]
 
 # List of tuples with the follwing format
