@@ -101,6 +101,7 @@ assets_to_remove = [
     "/mail_tracking/static/src/css/mail_tracking.scss",
     "/mail_tracking/static/src/css/failed_message.scss",
     "/mis_builder/static/src/css/custom.css",
+    "/project_timeline/static/src/scss/project_timeline.scss"
 ]
 
 
