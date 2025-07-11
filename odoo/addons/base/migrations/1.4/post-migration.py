@@ -163,6 +163,8 @@ def migrate(env, installed_version):
         modules_to_remove += modules_to_remove.downstream_dependencies()
         modules_to_remove.module_uninstall()
         modules_to_remove.unlink()
+    env.cr.execute("UPDATE res_partner SET l10n_mx_edi_usage = 'S01' WHERE l10n_mx_edi_usage = 'P01';")
+    env.cr.execute("UPDATE res_partner SET l10n_mx_edi_supplier_usage = 'S01' WHERE l10n_mx_edi_supplier_usage = 'P01';")
     if external_ids_to_remove:
         _logger.warning('Removing external IDs')
         for external_id in external_ids_to_remove:
