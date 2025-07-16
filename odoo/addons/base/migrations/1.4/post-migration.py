@@ -224,8 +224,8 @@ def migrate(env, installed_version):
     _logger.warning('Updating res_partner l10n_mx_edi_usage and l10n_mx_edi_supplier_usage from P01 to G03')
     env.cr.execute("UPDATE res_partner SET l10n_mx_edi_usage = 'G03' WHERE l10n_mx_edi_usage = 'P01';")
     env.cr.execute("UPDATE res_partner SET l10n_mx_edi_supplier_usage = 'G03' WHERE l10n_mx_edi_supplier_usage = 'P01';")
-    _logger.warning('Remove account_account_account_tag with id 1147')
-    env.cr.execute("DELETE FROM account_account_account_tag WHERE account_account_tag_id = 1147;")
+    _logger.warning('Remove account_account_account_tag with id 1147 and 1001')
+    env.cr.execute("DELETE FROM account_account_account_tag WHERE account_account_tag_id IN (1147, 1001);")
     if assets_to_remove:
         _logger.warning('Removing ir_assets')
         for asset in assets_to_remove:
