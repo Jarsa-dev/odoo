@@ -100,7 +100,10 @@ def migrate(env, installed_version):
         for view in views_to_activate:
             view_record = env.ref(view, raise_if_not_found=False)
             if view_record:
-                view_record.active = True
+                try:
+                    view_record.active = True
+                except Exception as e:
+                    _logger.warning(f'Error activating view {view}: {e}')
             else:
                 _logger.warning(f'View {view} not found')
     env.cr.execute("""
