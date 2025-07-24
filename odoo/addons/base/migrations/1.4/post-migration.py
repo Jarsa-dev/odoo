@@ -11,6 +11,7 @@ _logger = logging.getLogger(__name__)
 to_install = [
     "hr_timesheet_operating_unit",
     "stock_analytic",
+    "l10n_mx_edi_statement_line_payment_method",
 ]
 
 # List of modules to remove (uninstall)
