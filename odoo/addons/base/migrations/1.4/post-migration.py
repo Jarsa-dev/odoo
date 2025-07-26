@@ -12,6 +12,7 @@ to_install = [
     "hr_timesheet_operating_unit",
     "stock_analytic",
     "l10n_mx_edi_statement_line_payment_method",
+    "l10n_mx_edi_account_move_payment_report",
 ]
 
 # List of modules to remove (uninstall)
