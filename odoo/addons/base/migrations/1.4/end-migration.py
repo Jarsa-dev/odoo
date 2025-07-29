@@ -112,5 +112,8 @@ def migrate(env, installed_version):
         latest_version = '17.0.1.4'
         WHERE name = 'base';
     """)
+    env.ref("account_reports.menu_action_account_report_gt").write({
+        "groups_id": [(5,0,0)],
+    })
     os.system('say el script de migración ha concluido')
     _logger.warning('The migration has finished')
