@@ -115,5 +115,6 @@ def migrate(env, installed_version):
     env.ref("account_reports.menu_action_account_report_gt").write({
         "groups_id": [(5,0,0)],
     })
+    env.cr.execute("DELETE FROM base_automation WHERE id = 8;")
     os.system('say el script de migración ha concluido')
     _logger.warning('The migration has finished')
