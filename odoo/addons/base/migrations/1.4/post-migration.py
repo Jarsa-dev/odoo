@@ -14,6 +14,7 @@ to_install = [
     "l10n_mx_edi_statement_line_payment_method",
     "l10n_mx_edi_account_move_payment_report",
     "queue_job_cron_jobrunner",
+    "report_sale_order_mtnmx",
 ]
 
 # List of modules to remove (uninstall)
