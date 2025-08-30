@@ -116,5 +116,6 @@ def migrate(env, installed_version):
         "groups_id": [(5,0,0)],
     })
     env.cr.execute("DELETE FROM base_automation WHERE id = 8;")
+    env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
     os.system('say el script de migración ha concluido')
     _logger.warning('The migration has finished')
