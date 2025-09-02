@@ -7,6 +7,8 @@ import os
 from openupgradelib import openupgrade
 from odoo.tools import float_compare
 
+import datetime
+
 _logger = logging.getLogger(__name__)
 
 
@@ -83,6 +85,32 @@ views_to_activate = [
 ]
 
 
+def _process_edi_files(env):
+    _logger.warning('Processing EDI files')
+    move_ids = env["account.move"].search([
+        ("l10n_mx_edi_document_ids", "=", False),
+        ("move_type", "in", ("out_invoice", "out_refund", "in_invoice", "in_refund")),
+        ("state", "=", "posted"),
+    ]).ids
+    attachments = env["ir.attachment"].search([
+        ("res_model", "=", "account.move"),
+        ("name", "=ilike", "%.xml"),
+        ("res_id", "in", move_ids),
+    ])
+    for attachment in attachments:
+        try:
+            env['l10n_mx_edi.document'].create({
+                'move_id': attachment.res_id,
+                'invoice_ids': [(4, attachment.res_id)],
+                'state': 'invoice_sent',
+                'sat_state': 'not_defined',
+                'attachment_id': attachment.id,
+                'datetime': datetime.datetime.now(),
+            })
+        except Exception as e:
+            _logger.warning(f'Error processing attachment {attachment.id} for move {attachment.res_id}: {e}')
+
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
     if records_to_remove:
@@ -117,5 +145,6 @@ def migrate(env, installed_version):
     })
     env.cr.execute("DELETE FROM base_automation WHERE id = 8;")
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
-    os.system('say el script de migración ha concluido')
+    _process_edi_files(env)
     _logger.warning('The migration has finished')
+    
