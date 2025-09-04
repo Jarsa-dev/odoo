@@ -112,6 +112,12 @@ def _process_edi_files(env):
             _logger.warning(f'Error processing attachment {attachment.id} for move {attachment.res_id}: {e}')
 
 
+def _archive_jornals(env):
+    to_archive = [112, 134, 179, 214, 224, 251]
+    env['account.journal'].browse(to_archive).write({'active': False})
+    _logger.warning(f'Archived {len(journals)} journals')
+
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
     if records_to_remove:
@@ -147,5 +153,6 @@ def migrate(env, installed_version):
     env.cr.execute("DELETE FROM base_automation WHERE id = 8;")
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
     _process_edi_files(env)
+    _archive_jornals(env)
     _logger.warning('The migration has finished')
     
