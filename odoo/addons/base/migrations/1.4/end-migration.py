@@ -87,17 +87,18 @@ views_to_activate = [
 
 def _process_edi_files(env):
     _logger.warning('Processing EDI files')
-    move_ids = env["account.move"].search([
-        ("l10n_mx_edi_document_ids", "=", False),
-        ("move_type", "in", ("out_invoice", "out_refund", "in_invoice", "in_refund")),
-        ("state", "=", "posted"),
-    ]).ids
+    edi_documents = env['l10n_mx_edi.document'].search([])
     attachments = env["ir.attachment"].search([
         ("res_model", "=", "account.move"),
         ("name", "=ilike", "%.xml"),
-        ("res_id", "in", move_ids),
+        ("res_id", "not in", edi_documents.mapped('move_id').ids),
     ])
+    _logger.warning(f'Found {len(attachments)} attachments to process')
+    count = 0
     for attachment in attachments:
+        count += 1
+        if count % 100 == 0:
+            _logger.warning(f'Processing attachment {count}/{len(attachments)}')
         try:
             env['l10n_mx_edi.document'].create({
                 'move_id': attachment.res_id,
