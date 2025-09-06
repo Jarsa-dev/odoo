@@ -121,6 +121,23 @@ def _archive_jornals(env):
     env['account.journal'].browse(to_archive).write({'active': False})
 
 
+def _process_diot_fix(env):
+    _logger.warning('Processing DIOT fix')
+    map_tax_tags = {
+        "+DIOT: 16% NO ACREDITABLE": "+DIOT: 16% NO ACREDITABLE TAX",
+    }
+    for old_tag, new_tag in map_tax_tags.items():
+        old_tag_rec = env['account.account.tag'].search([('name', '=', old_tag)], limit=1)
+        new_tag_rec = env['account.account.tag'].search([('name', '=', new_tag)], limit=1)
+        env.cr.execute("""
+            UPDATE account_account_tag_account_move_line_rel
+            SET account_account_tag_id = %(new_id)s
+            WHERE account_account_tag_id = %(old_id)s;
+        """, {
+            'new_id': new_tag_rec.id,
+            'old_id': old_tag_rec.id,
+        })
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
     if records_to_remove:
@@ -157,5 +174,6 @@ def migrate(env, installed_version):
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
     _process_edi_files(env)
     _archive_jornals(env)
+    _process_diot_fix(env)
     _logger.warning('The migration has finished')
     
