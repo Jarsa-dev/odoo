@@ -137,6 +137,14 @@ def _process_diot_fix(env):
             'new_id': new_tag_rec.id,
             'old_id': old_tag_rec.id,
         })
+        env.cr.execute("""
+            UPDATE account_account_tag_account_tax_repartition_line_rel
+            SET account_account_tag_id = %(new_id)s
+            WHERE account_account_tag_id = %(old_id)s;
+        """, {
+            'new_id': new_tag_rec.id,
+            'old_id': old_tag_rec.id,
+        })
 
 @openupgrade.migrate()
 def migrate(env, installed_version):
@@ -174,6 +182,6 @@ def migrate(env, installed_version):
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
     _process_edi_files(env)
     _archive_jornals(env)
-    _process_diot_fix(env)
+    # _process_diot_fix(env)
     _logger.warning('The migration has finished')
     
