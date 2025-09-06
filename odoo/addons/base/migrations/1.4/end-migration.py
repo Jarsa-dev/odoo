@@ -114,13 +114,11 @@ def _process_edi_files(env):
                 })
         except Exception as e:
             _logger.warning(f'Error processing attachment {attachment_id} for move {res_id}: {e}')
-    env.cr.commit()
 
 
 def _archive_jornals(env):
     to_archive = [112, 134, 179, 214, 224, 251]
     env['account.journal'].browse(to_archive).write({'active': False})
-    _logger.warning(f'Archived {len(journals)} journals')
 
 
 @openupgrade.migrate()
