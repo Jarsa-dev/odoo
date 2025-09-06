@@ -92,24 +92,29 @@ def _process_edi_files(env):
         ("res_model", "=", "account.move"),
         ("name", "=ilike", "%.xml"),
         ("res_id", "not in", edi_documents.mapped('move_id').ids),
+        ("res_id", "!=", False),
     ])
     _logger.warning(f'Found {len(attachments)} attachments to process')
     count = 0
     for attachment in attachments:
         count += 1
+        attachment_id = attachment.id
+        res_id = attachment.res_id
         if count % 100 == 0:
             _logger.warning(f'Processing attachment {count}/{len(attachments)}')
         try:
-            env['l10n_mx_edi.document'].create({
-                'move_id': attachment.res_id,
-                'invoice_ids': [(4, attachment.res_id)],
-                'state': 'invoice_sent',
-                'sat_state': 'not_defined',
-                'attachment_id': attachment.id,
-                'datetime': datetime.datetime.now(),
-            })
+            with env.cr.savepoint():
+                env['l10n_mx_edi.document'].create({
+                    'move_id': attachment.res_id,
+                    'invoice_ids': [(4, attachment.res_id)],
+                    'state': 'invoice_sent',
+                    'sat_state': 'not_defined',
+                    'attachment_id': attachment.id,
+                    'datetime': datetime.datetime.now(),
+                })
         except Exception as e:
-            _logger.warning(f'Error processing attachment {attachment.id} for move {attachment.res_id}: {e}')
+            _logger.warning(f'Error processing attachment {attachment_id} for move {res_id}: {e}')
+    env.cr.commit()
 
 
 def _archive_jornals(env):
