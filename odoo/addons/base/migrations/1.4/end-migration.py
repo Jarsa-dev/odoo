@@ -115,7 +115,7 @@ def _process_edi_files(env):
         except Exception as e:
             _logger.warning(f'Error processing attachment {attachment_id} for move {res_id}: {e}')
     edi_documents = env['l10n_mx_edi.document'].search([])
-    moves = edi_documents.mapped('move_id')
+    moves = edi_documents.mapped('move_id').filtered(lambda m: not m.l10n_mx_edi_cfdi_uuid)
     count = 0
     for move in moves:
         move_id = move.id
