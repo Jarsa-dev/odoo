@@ -204,5 +204,6 @@ def migrate(env, installed_version):
     _archive_jornals(env)
     # _process_diot_fix(env)
     _fix_caba_journals(env)
+    _logger.warning("Remove usage p01 from purchase orders")
+    env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
     _logger.warning('The migration has finished')
-    
