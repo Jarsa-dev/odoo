@@ -114,18 +114,6 @@ def _process_edi_files(env):
                 })
         except Exception as e:
             _logger.warning(f'Error processing attachment {attachment_id} for move {res_id}: {e}')
-    edi_documents = env['l10n_mx_edi.document'].search([])
-    moves = edi_documents.mapped('move_id').filtered(lambda m: not m.l10n_mx_edi_cfdi_uuid)
-    count = 0
-    for move in moves:
-        move_id = move.id
-        count += 1
-        if count % 100 == 0:
-            _logger.warning(f'Processing move {move_id} for CFDI fiscal folio {count}/{len(moves)}')
-        try:
-            move._compute_l10n_mx_edi_cfdi_state_and_attachment()
-        except Exception as e:
-            _logger.warning(f'Error processing move {move_id}: {e}')
 
 
 def _archive_jornals(env):
@@ -156,6 +144,25 @@ def _process_diot_fix(env):
         """, {
             'new_id': new_tag_rec.id,
             'old_id': old_tag_rec.id,
+        })
+
+def _fix_caba_journals(env):
+    _logger.warning('Fixing Cash Basis journals')
+    caba_company_dict = {
+        3: 141,
+        1: 77,
+        6: 216,
+        4: 187,
+        18: 442,
+    }
+    for company_id, caba_journal_id in caba_company_dict.items():
+        env.cr.commit("""
+            UPDATE res_company
+            SET tax_cash_basis_journal_id = %(caba_journal_id)s
+            WHERE id = %(company_id)s;
+        """, {
+            'caba_journal_id': caba_journal_id,
+            'company_id': company_id,
         })
 
 @openupgrade.migrate()
@@ -195,5 +202,6 @@ def migrate(env, installed_version):
     _process_edi_files(env)
     _archive_jornals(env)
     # _process_diot_fix(env)
+    _fix_caba_journals(env)
     _logger.warning('The migration has finished')
     
