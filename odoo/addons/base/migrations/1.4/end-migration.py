@@ -114,6 +114,18 @@ def _process_edi_files(env):
                 })
         except Exception as e:
             _logger.warning(f'Error processing attachment {attachment_id} for move {res_id}: {e}')
+    edi_documents = env['l10n_mx_edi.document'].search([])
+    moves = edi_documents.mapped('move_id')
+    count = 0
+    for move in moves:
+        move_id = move.id
+        count += 1
+        if count % 100 == 0:
+            _logger.warning(f'Processing move {move_id} for CFDI fiscal folio {count}/{len(moves)}')
+        try:
+            move._compute_l10n_mx_edi_cfdi_state_and_attachment()
+        except Exception as e:
+            _logger.warning(f'Error processing move {move_id}: {e}')
 
 
 def _archive_jornals(env):
