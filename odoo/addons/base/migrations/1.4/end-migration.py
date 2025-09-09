@@ -23,6 +23,7 @@ to_remove = [
     "mail_restrict_follower_selection",
     "account_tax_cash_basis_reference",
     "product_expiry",
+    "purchase_analytic",
 ]
 
 
