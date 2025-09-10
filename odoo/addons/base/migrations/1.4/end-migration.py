@@ -208,4 +208,6 @@ def migrate(env, installed_version):
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
     _logger.warning("Set analytic decimal percentage to 10")
     env.ref("analytic.decimal_percentage_analytic").write({"digits": 10})
+    _logger.warning("Set Folio Fiscal in account.move")
+    env.cr.execute("UPDATE account_move SET l10n_mx_edi_cfdi_uuid = x_folio_fiscal WHERE x_folio_fiscal IS NOT NULL;")
     _logger.warning('The migration has finished')
