@@ -206,4 +206,6 @@ def migrate(env, installed_version):
     _fix_caba_journals(env)
     _logger.warning("Remove usage p01 from purchase orders")
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
+    _logger.warning("Set analytic decimal percentage to 10")
+    env.ref("analytic.decimal_percentage_analytic").write({"digits": 10})
     _logger.warning('The migration has finished')
