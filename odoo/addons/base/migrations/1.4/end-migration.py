@@ -157,7 +157,7 @@ def _fix_caba_journals(env):
         18: 442,
     }
     for company_id, caba_journal_id in caba_company_dict.items():
-        env.cr.commit("""
+        env.cr.execute("""
             UPDATE res_company
             SET tax_cash_basis_journal_id = %(caba_journal_id)s
             WHERE id = %(company_id)s;
