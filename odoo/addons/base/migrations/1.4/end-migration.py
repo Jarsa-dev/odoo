@@ -203,7 +203,7 @@ def migrate(env, installed_version):
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
     _process_edi_files(env)
     _archive_jornals(env)
-    _process_diot_fix(env)
+    # _process_diot_fix(env)
     _fix_caba_journals(env)
     _logger.warning("Remove usage p01 from purchase orders")
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
