@@ -126,7 +126,7 @@ def _process_diot_fix(env):
     _logger.warning('Processing DIOT fix')
     map_tax_tags = {
         "+DIOT: 16% NO ACREDITABLE": "+DIOT: 16% NO ACREDITABLE TAX",
-        "+DIOT: 8% N. NO ACREDITABLE": "+DIOT: 8% NO ACREDITABLE TAX",
+        "+DIOT: 8% N. NO ACREDITABLE": "+DIOT: 8% N. NO ACREDITABLE TAX",
     }
     for old_tag, new_tag in map_tax_tags.items():
         old_tag_rec = env['account.account.tag'].search([('name', '=', old_tag)], limit=1)
@@ -203,7 +203,7 @@ def migrate(env, installed_version):
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
     _process_edi_files(env)
     _archive_jornals(env)
-    # _process_diot_fix(env)
+    _process_diot_fix(env)
     _fix_caba_journals(env)
     _logger.warning("Remove usage p01 from purchase orders")
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
