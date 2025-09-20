@@ -147,6 +147,53 @@ def _process_diot_fix(env):
             'new_id': new_tag_rec.id,
             'old_id': old_tag_rec.id,
         })
+    map_tax_dict = {
+        (8855, 3773, 3794, 3992): "+DIOT: Refunds 8% N.",
+        (1640, 2221, 349, 8854, ): "+DIOT: Refunds 16%",
+    }
+    for account_ids, tag_name in map_tax_dict.items():
+        tag = env['account.account.tag'].search([('name', '=', tag_name)], limit=1)
+        env.cr.execute("SELECT move_id FROM account_move_line WHERE account_id IN %(account_ids)s AND tax_tag_invert = true;", {
+            'account_ids': tuple(account_ids),
+        })
+        move_ids = [x[0] for x in env.cr.fetchall()]
+        env.cr.execute("""
+            UPDATE account_move_line
+            SET tax_tag_invert = true
+            WHERE
+                move_id IN %(move_ids)s
+                AND tax_tag_invert = false
+                AND account_id IN %(account_ids)s;
+            """, {
+            'move_ids': tuple(move_ids),
+            'account_ids': tuple(account_ids),
+        })
+        env.cr.execute("SELECT id FROM account_move_line WHERE account_id IN %(account_ids)s AND tax_tag_invert = true;", {
+            'account_ids': tuple(account_ids),
+        })
+        aml_ids = [x[0] for x in env.cr.fetchall()]
+        for aml_id in aml_ids:
+            env.cr.execute("INSERT INTO account_account_tag_account_move_line_rel (account_move_line_id, account_account_tag_id) VALUES (%(aml_id)s, %(tag_id)s) ON CONFLICT DO NOTHING;", {
+                'aml_id': aml_id,
+                'tag_id': tag.id,
+            })
+    map_tax_dict = {
+        (90, 126, 43, 676, 723, 760, 164, 174, 183): "+DIOT: Refunds",
+    }
+    for tax_ids, tag_name in map_tax_dict.items():
+        tag = env['account.account.tag'].search([('name', '=', tag_name)], limit=1)
+        env.cr.execute("""
+            DELETE FROM account_account_tag_account_move_line_rel
+            WHERE account_account_tag_id = %(tag_id)s
+            AND account_move_line_id IN (
+                SELECT account_move_line_id FROM account_move_line_account_tax_rel
+                WHERE account_tax_id IN %(tax_ids)s
+            );
+        """, {
+            'tag_id': tag.id,
+            'tax_ids': tuple(tax_ids),
+        })
+
 
 def _fix_caba_journals(env):
     _logger.warning('Fixing Cash Basis journals')
