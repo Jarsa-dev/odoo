@@ -85,6 +85,14 @@ views_to_activate = [
     "purchase_order_pivot.purchase_order_lines_pivot_trppw_view",
 ]
 
+jornals_to_archive = [
+    252, 425, 143, 140, 211
+]
+
+
+def _archive_jornals(env):
+    _logger.warning('Archiving journals')
+    env['account.journal'].browse(jornals_to_archive).write({'active': False})
 
 def _process_edi_files(env):
     _logger.warning('Processing EDI files')
@@ -252,6 +260,7 @@ def migrate(env, installed_version):
     _archive_jornals(env)
     _process_diot_fix(env)
     _fix_caba_journals(env)
+    _archive_jornals(env)
     _logger.warning("Remove usage p01 from purchase orders")
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
     _logger.warning("Set analytic decimal percentage to 10")
