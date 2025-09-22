@@ -7,6 +7,8 @@ import os
 from openupgradelib import openupgrade
 from odoo.tools import float_compare
 
+from dateutil import relativedelta
+
 import datetime
 
 _logger = logging.getLogger(__name__)
@@ -222,6 +224,75 @@ def _fix_caba_journals(env):
             'company_id': company_id,
         })
 
+
+def _update_leave_allocation(env):
+    _logger.warning('Updating leave allocation')
+    year_days_dict = {
+        1: 12,
+        2: 14,
+        3: 16,
+        4: 18,
+        5: 20,
+        6: 22,
+        7: 22,
+        8: 22,
+        9: 22,
+        10: 22,
+        11: 24,
+        12: 24,
+        13: 24,
+        14: 24,
+        15: 24,
+        16: 26,
+        17: 26,
+        18: 26,
+        19: 26,
+        20: 26,
+        21: 28,
+        22: 28,
+        23: 28,
+        24: 28,
+        25: 28,
+        26: 30,
+        27: 30,
+        28: 30,
+        29: 30,
+        30: 30,
+        31: 32,
+    }
+
+    allocations = env["hr.leave.allocation"].search([])
+    records = allocations.mapped("employee_id")
+    allocations.write({"state": "confirm"})
+    allocations.unlink()
+    last_year = datetime.date.today().year - 1
+
+    for rec in records:
+        contract = env["hr.contract"].search([("employee_id", "=", rec.id), ("state", "=", "open"), ("company_id", "=", rec.company_id.id)])
+        if not contract:
+            raise UserError("El empleado debe tener un contrato activo para crear sus vacaciones")
+        past_contracts = env["hr.contract"].search([("employee_id", "=", rec.id), ("company_id", "=", rec.company_id.id), ("id", "!=", contract.id)], order="date_end desc")
+        for past_contract in past_contracts:
+            if not past_contract.date_end:
+                continue
+            if (contract.date_start - past_contract.date_end).days < 30:
+                contract = past_contract
+            else:
+                continue
+        for year, days in year_days_dict.items():
+            date_start = contract.date_start + relativedelta(years=year)
+            allocation = env["hr.leave.allocation"].create({
+                "name": f"{rec.name} - Año {year}",
+                "holiday_status_id": rec.company_id.vacation_leave_type.id,
+                "allocation_type": "regular",
+                "date_from": date_start,
+                "date_to": date_start + relativedelta(years=1, months=6) if date_start.year >= last_year else False,
+                "number_of_days": days,
+                "holiday_type": "employee",
+                "employee_id": rec.id,
+            })
+            allocation.action_validate()
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
     if records_to_remove:
@@ -261,6 +332,7 @@ def migrate(env, installed_version):
     _process_diot_fix(env)
     _fix_caba_journals(env)
     _archive_jornals(env)
+    _update_leave_allocation(env)
     _logger.warning("Remove usage p01 from purchase orders")
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
     _logger.warning("Set analytic decimal percentage to 10")
