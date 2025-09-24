@@ -341,4 +341,7 @@ def migrate(env, installed_version):
     env.cr.execute("UPDATE account_move SET l10n_mx_edi_cfdi_uuid = x_folio_fiscal WHERE x_folio_fiscal IS NOT NULL;")
     _logger.warning("Set filter_hide_0_lines to by_default in all account.report")
     env["account.report"].search([]).write({"filter_hide_0_lines": "by_default"})
+    _logger.warning("Set l10n_mx_edi_decimal_places to 6 in USD and MXN")
+    env.ref("base.MXN").write({"l10n_mx_edi_decimal_places": 6})
+    env.ref("base.USD").write({"l10n_mx_edi_decimal_places": 6})
     _logger.warning('The migration has finished')
