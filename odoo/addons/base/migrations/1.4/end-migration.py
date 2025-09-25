@@ -29,6 +29,78 @@ to_remove = [
 ]
 
 
+templates_to_reset = [
+    "calendar.calendar_template_meeting_update",
+    "calendar.calendar_template_meeting_changedate",
+    "calendar.calendar_template_meeting_invitation",
+    "calendar.calendar_template_meeting_reminder",
+    "website_slides.mail_template_channel_shared",
+    "base_install_request.mail_template_base_install_request",
+    "hr_presence.mail_template_presence",
+    "website_slides_survey.mail_template_user_input_certification_failed",
+    "survey.mail_template_user_input_invite",
+    "survey.mail_template_certification",
+    "documents_hr.mail_template_document_folder_link",
+    "stock.mail_template_data_delivery_confirmation",
+    "account.email_template_edi_invoice",
+    "mail_group.mail_template_guidelines",
+    "mail_group.mail_template_list_subscribe",
+    "mail_group.mail_template_list_unsubscribe",
+    "timesheet_grid.mail_template_timesheet_reminder_user",
+    "timesheet_grid.mail_template_timesheet_reminder",
+    "timesheet_grid.mail_template_timesheet_reminder_manager",
+    "gamification.email_template_badge_received",
+    "gamification.simple_report_template",
+    "gamification.email_template_goal_reminder",
+    "account.email_template_edi_credit_note",
+    "iap_extract.iap_extract_no_credit",
+    "crm_iap_mine.lead_generation_no_credits",
+    "purchase.email_template_edi_purchase_done",
+    "purchase.email_template_edi_purchase",
+    "purchase.email_template_edi_purchase_reminder",
+    "sale.mail_template_sale_confirmation",
+    "sale.email_template_edi_sale",
+    "website_profile.validation_email",
+    "portal.mail_template_data_portal_welcome",
+    "hr_recruitment_survey.mail_template_applicant_interview_invite",
+    "account.mail_template_data_payment_receipt",
+    "hr_recruitment.email_template_data_applicant_congratulations",
+    "hr_recruitment.email_template_data_applicant_interest",
+    "hr_recruitment.email_template_data_applicant_refuse",
+    "hr_recruitment.email_template_data_applicant_not_interested",
+    "account_followup.email_template_followup_1",
+    "account_online_synchronization.email_template_sync_reminder",
+    "auth_signup.set_password_email",
+    "auth_signup.mail_template_user_signup_account_created",
+    "auth_signup.mail_template_data_unregistered_users",
+    "website_payment.mail_template_donation",
+    "documents.mail_template_document_request",
+    "documents.mail_template_document_request_reminder",
+    "sale_subscription.mail_template_subscription_alert",
+    "sale_subscription.email_payment_close",
+    "sale_subscription.mail_template_subscription_invoice",
+    "sale_subscription.email_payment_success",
+    "sale_subscription.email_payment_reminder",
+    "sale_subscription.mail_template_subscription_rating",
+    "project.mail_template_data_project_task",
+    "helpdesk.new_ticket_request_email_template",
+    "helpdesk.solved_ticket_request_email_template",
+    "helpdesk.rating_ticket_request_email_template",
+    "gamification.mail_template_data_new_rank_reached",
+    "hr_appraisal.mail_template_appraisal_confirm",
+    "hr_appraisal_survey.mail_template_appraisal_ask_feedback",
+    "hr_appraisal.mail_template_appraisal_request_from_employee",
+    "hr_appraisal.mail_template_appraisal_request",
+    "sale.mail_template_sale_cancellation",
+    "sale.mail_template_sale_payment_executed",
+    "website_slides.mail_template_slide_channel_enroll",
+    "website_slides.slide_template_shared",
+    "website_slides.mail_template_slide_channel_invite",
+    "website_slides.slide_template_published",
+    "website_slides.mail_template_channel_completed",
+]
+
+
 # List of strings with XML ID.
 records_to_remove = [
 ]
@@ -293,6 +365,20 @@ def _update_leave_allocation(env):
             })
             allocation.action_validate()
 
+
+def _reset_templates(env, templates_to_reset):
+    _logger.warning('Resetting templates')
+    for template_xml_id in templates_to_reset:
+        template = env.ref(template_xml_id, raise_if_not_found=False)
+        if template:
+            try:
+                template.reset_template()
+            except Exception as e:
+                _logger.warning(f'Error resetting template {template_xml_id}: {e}')
+        else:
+            _logger.warning(f'Template {template_xml_id} not found')
+
+
 @openupgrade.migrate()
 def migrate(env, installed_version):
     if records_to_remove:
@@ -316,6 +402,8 @@ def migrate(env, installed_version):
                     _logger.warning(f'Error activating view {view}: {e}')
             else:
                 _logger.warning(f'View {view} not found')
+    if templates_to_reset:
+        _reset_templates(env, templates_to_reset)
     env.cr.execute("""
         UPDATE ir_module_module
         SET
