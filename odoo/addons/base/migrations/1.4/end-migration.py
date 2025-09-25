@@ -473,4 +473,6 @@ def migrate(env, installed_version):
     _logger.warning("Set l10n_mx_edi_decimal_places to 6 in USD and MXN")
     env.ref("base.MXN").write({"l10n_mx_edi_decimal_places": 6})
     env.ref("base.USD").write({"l10n_mx_edi_decimal_places": 6})
+    _logger.warning("Delete payment term lines with 0 amount")
+    env.cr.execute("DELETE FROM account_payment_term_line WHERE value_amount = 0 AND value = 'fixed' AND nb_days = 0;")
     _logger.warning('The migration has finished')
