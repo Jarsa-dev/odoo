@@ -16,6 +16,7 @@ to_install = [
     "queue_job_cron_jobrunner",
     "report_sale_order_mtnmx",
     "l10n_mx_edi_decimal_fix",
+    "account_bank_statement_mtnmx",
 ]
 
 # List of modules to remove (uninstall)
