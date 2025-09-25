@@ -275,6 +275,47 @@ def _process_diot_fix(env):
             'tag_id': tag.id,
             'tax_ids': tuple(tax_ids),
         })
+    plus_refund_tag = env['account.account.tag'].search([('name', '=', "+DIOT: Retención")], limit=1)
+    minus_refund_tag = env['account.account.tag'].search([('name', '=', "-DIOT: Retención")], limit=1)
+    env.cr.execute("""
+        SELECT aml.id
+        FROM account_account_tag_account_move_line_rel as atamlr
+        LEFT JOIN account_move_line aml ON aml.id = atamlr.account_move_line_id
+        WHERE atamlr.account_account_tag_id = 1230 AND aml.credit > 0;
+    """, {
+        'plus_refund_tag_id': plus_refund_tag.id,
+    })
+    aml_ids = [x[0] for x in env.cr.fetchall()]
+    env.cr.execute("""
+        UPDATE account_account_tag_account_move_line_rel
+        SET account_account_tag_id = %(minus_refund_tag_id)s
+        WHERE account_account_tag_id = %(plus_refund_tag_id)s
+        AND account_move_line_id IN %(aml_ids)s;
+    """, {
+        'minus_refund_tag_id': minus_refund_tag.id,
+        'plus_refund_tag_id': plus_refund_tag.id,
+        'aml_ids': tuple(aml_ids),
+    })
+    env.cr.execute("""
+        SELECT aml.id
+        FROM account_account_tag_account_move_line_rel as atamlr
+        JOIN account_move_line aml ON aml.id = atamlr.account_move_line_id
+        WHERE atamlr.account_account_tag_id = %(minus_refund_tag_id)s
+        AND aml.debit > 0;
+    """, {
+        'minus_refund_tag_id': minus_refund_tag.id,
+    })
+    aml_ids = [x[0] for x in env.cr.fetchall()]
+    env.cr.execute("""
+        UPDATE account_account_tag_account_move_line_rel
+        SET account_account_tag_id = %(plus_refund_tag_id)s
+        WHERE account_account_tag_id = %(minus_refund_tag_id)s
+        AND account_move_line_id IN %(aml_ids)s;
+    """, {
+        'plus_refund_tag_id': plus_refund_tag.id,
+        'minus_refund_tag_id': minus_refund_tag.id,
+        'aml_ids': tuple(aml_ids),
+    })
 
 
 def _fix_caba_journals(env):
