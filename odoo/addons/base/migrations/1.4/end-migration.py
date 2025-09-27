@@ -160,7 +160,7 @@ views_to_activate = [
 ]
 
 jornals_to_archive = [
-    252, 425, 143, 140, 211
+    112, 134, 140, 143, 179, 211, 214, 224, 251, 252, 425
 ]
 
 
@@ -197,11 +197,6 @@ def _process_edi_files(env):
                 })
         except Exception as e:
             _logger.warning(f'Error processing attachment {attachment_id} for move {res_id}: {e}')
-
-
-def _archive_jornals(env):
-    to_archive = [112, 134, 179, 214, 224, 251]
-    env['account.journal'].browse(to_archive).write({'active': False})
 
 
 def _process_diot_fix(env):
@@ -457,7 +452,6 @@ def migrate(env, installed_version):
     env.cr.execute("DELETE FROM base_automation WHERE id = 8;")
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
     _process_edi_files(env)
-    _archive_jornals(env)
     _process_diot_fix(env)
     _fix_caba_journals(env)
     _archive_jornals(env)
