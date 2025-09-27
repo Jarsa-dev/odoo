@@ -394,7 +394,7 @@ def _update_leave_allocation(env):
                 "holiday_status_id": rec.company_id.vacation_leave_type.id,
                 "allocation_type": "regular",
                 "date_from": date_start,
-                "date_to": date_start + relativedelta(years=1, months=6) if date_start.year >= last_year else False,
+                "date_to": date_start + relativedelta(years=1, months=6) if date_start.year >= last_year else datetime.date(day=date_start.day, month=date_start.month, year=last_year),
                 "number_of_days": days,
                 "holiday_type": "employee",
                 "employee_id": rec.id,
