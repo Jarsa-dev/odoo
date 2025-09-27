@@ -181,7 +181,13 @@ def remove_module_security(env, module_list):
 @openupgrade.migrate()
 def migrate(env, installed_version):
     _logger.warning("Change rounding for currencies")
-    env.ref("base.USD").write({"rounding": 0.000001})
+    env.ref("base.USD").write(
+        {
+            "rounding": 0.000001,
+            "symbol": "USD$",
+
+        }
+    )
     env.ref("base.MXN").write({"rounding": 0.000001})
     if records_to_remove:
         _logger.warning('Delete records from XML ID')
