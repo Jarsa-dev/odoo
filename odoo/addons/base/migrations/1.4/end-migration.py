@@ -22,7 +22,6 @@ to_remove = [
     "sale_subscription_operating_unit",
     "account_cash_basis_mix_currency_fix",
     "partner_group",
-    "mail_restrict_follower_selection",
     "account_tax_cash_basis_reference",
     "product_expiry",
     "purchase_analytic",
