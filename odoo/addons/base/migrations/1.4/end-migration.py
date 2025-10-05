@@ -7,7 +7,7 @@ import os
 from openupgradelib import openupgrade
 from odoo.tools import float_compare
 
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 
 import datetime
 
@@ -367,6 +367,39 @@ def _update_leave_allocation(env):
         30: 30,
         31: 32,
     }
+    old_year_days_dict = {
+        1: 6,
+        2: 8,
+        3: 10,
+        4: 12,
+        5: 14,
+        6: 14,
+        7: 14,
+        8: 14,
+        9: 14,
+        10: 16,
+        11: 16,
+        12: 16,
+        13: 16,
+        14: 16,
+        15: 18,
+        16: 18,
+        17: 18,
+        18: 18,
+        19: 18,
+        20: 20,
+        21: 20,
+        22: 20,
+        23: 20,
+        24: 20,
+        25: 22,
+        26: 22,
+        27: 22,
+        28: 22,
+        29: 22,
+        30: 24,
+        31: 24,
+    }
 
     allocations = env["hr.leave.allocation"].search([])
     records = allocations.mapped("employee_id")
@@ -388,6 +421,8 @@ def _update_leave_allocation(env):
                 continue
         for year, days in year_days_dict.items():
             date_start = contract.date_start + relativedelta(years=year)
+            if date_start.year < 2023:
+                days = old_year_days_dict.get(year, days)
             allocation = env["hr.leave.allocation"].create({
                 "name": f"{rec.name} - Año {year}",
                 "holiday_status_id": rec.company_id.vacation_leave_type.id,
