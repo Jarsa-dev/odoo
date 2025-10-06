@@ -485,6 +485,7 @@ def migrate(env, installed_version):
     })
     env.cr.execute("DELETE FROM base_automation WHERE id = 8;")
     env.cr.execute("DELETE FROM ir_config_parameter WHERE key = 'report.url';")
+    env.cr.execute("UPDATE ir_config_parameter SET key = '8436,8445' WHERE key = 'allowed_non_result_account_ids';")
     _process_edi_files(env)
     _process_diot_fix(env)
     _fix_caba_journals(env)
