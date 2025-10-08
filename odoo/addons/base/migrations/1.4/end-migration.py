@@ -448,6 +448,16 @@ def _reset_templates(env, templates_to_reset):
         else:
             _logger.warning(f'Template {template_xml_id} not found')
 
+def _delete_custom_financial_reports(env):
+    _logger.warning('Deleting custom financial reports')
+    report_ids = (9, 8)
+    env.cr.execute("DELETE FROM account_report WHERE id IN %(report_ids)s;", {
+        'report_ids': report_ids,
+    })
+    menu_ids = (1083, 1094, 1093)
+    env.cr.execute("DELETE FROM ir_ui_menu WHERE id IN %(menu_ids)s;", {
+        'menu_ids': menu_ids,
+    })
 
 @openupgrade.migrate()
 def migrate(env, installed_version):
