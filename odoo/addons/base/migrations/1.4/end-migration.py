@@ -474,6 +474,83 @@ def _update_leave_allocation(env):
         })
         env["hr.leave"].browse(id)._compute_duration()
 
+def _fix_tax_sat_type(env):
+    _logger.warning('Fixing tax SAT types')
+    tax_mapping = [
+        ("IEPS 8% VENTAS", "ieps"),
+        ("16% Ventas", "iva"),
+        ("16% Compras No Deducibles", "iva"),
+        ("IVA(16%) VENTAS", "iva"),
+        ("16% Compras", "iva"),
+        ("IVA Compras Exentas", "iva"),
+        ("IVA Compras 0%", "iva"),
+        ("RET ISR HONORARIOS 10%", "isr"),
+        ("RET IVA FLETES 4%", "iva"),
+        ("RET ISR ARRENDAMIENTO 10%", "isr"),
+        ("RETENCION IVA HONORARIOS 10.67%", "iva"),
+        ("RETENCION IVA ARRENDAMIENTO 10.67%", "iva"),
+        ("ISH 3%", "local"),
+        ("ISH 2.5%", "local"),
+        ("IVA(0%) COMPRAS", "iva"),
+        ("IVA(16%) COMPRAS", "iva"),
+        ("IVA Compras Exento", "iva"),
+        ("3% ISH", "local"),
+        ("2.5% ISH", "local"),
+        ("4% Estatal", "local"),
+        ("IEPS 8%", "ieps"),
+        ("ISH 4.16%", "local"),
+        ("IVA Ventas 8%", "iva"),
+        ("IVA Compras 8%", "iva"),
+        ("IVA Compras 8% No Deducibles", "iva"),
+        ("RETENCION IVA 5.33% ", "iva"),
+        ("ISH 4%", "local"),
+        ("ISH 2.8%", "local"),
+        ("ISH 3.5%", "local"),
+        ("ISH 2%", "local"),
+        ("IUIH 1%", "local"),
+        ("ISH 3.75%", "local"),
+        ("RET ISR PAGOS EXTRANJERO 10%", "isr"),
+        ("RET IVA 6%", "iva"),
+        ("RET IVA 3%", "iva"),
+        ("ISH 5%", "local"),
+        ("IVA Compras 16% No Deducibles", "iva"),
+        ("RET LOCAL 5 AL MILLAR", "local"),
+        ("IVA Ventas 0%", "iva"),
+        ("RET ISR RESICOS 1.25%", "isr"),
+        ("RET ISR Ventas Extranjeros 15%", "isr"),
+        ("16% Compras Importacion", "iva"),
+        ("IEPS 8% COMPRAS", "ieps"),
+        ("IEPS 25% VENTAS", "ieps"),
+        ("IVA Exento", "iva"),
+        ("IEPS 25% COMPRAS", "ieps"),
+        ("IEPS 26.5% VENTAS", "ieps"),
+        ("IEPS 26.5% COMPRAS", "ieps"),
+        ("IEPS 30% VENTAS", "ieps"),
+        ("IEPS 30% COMPRAS", "ieps"),
+        ("IEPS 53% VENTAS", "ieps"),
+        ("IEPS 53% COMPRAS", "ieps"),
+        ("ISH 4.2%", "local"),
+        ("RET IVA ARRENDAMIENTO 10%", "iva"),
+        ("1.25% WH", "isr"),
+        ("RET IVA ARRENDAMIENTO 10.67%", "iva"),
+        ("RET IVA HONORARIOS 10.67%", "iva"),
+        ("IVA 0% VENTAS", "iva"),
+        ("IVA 16% VENTAS", "iva"),
+        ("IVA 0% COMPRAS", "iva"),
+        ("IVA 8% N. COMPRAS", "iva"),
+        ("IVA 8% VENTAS", "iva"),
+        ("16% NO ACREDITABLE", "iva"),
+        ("[old] 16% IMPORTS", "iva"),
+        ("[old] 16% IMPORTS INTANGIBLES", "iva"),
+        ("Exento", "iva"),
+        ("[old] IVA 8% S. COMPRAS", "iva"),
+        ("16% IMP", "iva"),
+        ("16% IMP INT", "iva"),
+        ("8% S.", "iva"),
+    ]
+    for tax_name, sat_type in tax_mapping:
+        env["account.tax"].search([("name", "=", tax_name)]).write({"l10n_mx_tax_type": sat_type})
+
 
 def _reset_templates(env, templates_to_reset):
     _logger.warning('Resetting templates')
@@ -541,6 +618,7 @@ def migrate(env, installed_version):
     _archive_jornals(env)
     _update_leave_allocation(env)
     _delete_custom_financial_reports(env)
+    _fix_tax_sat_type(env)
     _logger.warning("Remove usage p01 from purchase orders")
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
     _logger.warning("Set analytic decimal percentage to 10")
