@@ -162,6 +162,38 @@ jornals_to_archive = [
     112, 134, 140, 143, 179, 211, 214, 224, 251, 252, 425
 ]
 
+missing_translations = [
+    ("account_account", "name"),
+    ("account_analytic_account", "name"),
+    ("product_template", "name"),
+]
+
+def _fix_missing_translations(env):
+    _logger.warning('Fixing missing translations')
+    for table, field in missing_translations:
+        query = f'''
+            UPDATE "{table}"
+            SET "{field}" = jsonb_set(
+                "{field}"::jsonb,
+                ARRAY['es_MX'],
+                to_jsonb(
+                    COALESCE(
+                        NULLIF(("{field}"::jsonb)->>'es_MX', ''),
+                        NULLIF(("{field}"::jsonb)->>'es_MX', 'false'),
+                        ("{field}"::jsonb)->>'en_US'
+                    )
+                ),
+                true
+            )
+            WHERE
+                (
+                    ("{field}"::jsonb)->>'es_MX' IS NULL
+                    OR ("{field}"::jsonb)->>'es_MX' = ''
+                    OR lower(("{field}"::jsonb)->>'es_MX') = 'false'
+                )
+                AND ("{field}"::jsonb) ? 'en_US';
+        '''
+        env.cr.execute(query)
 
 def _archive_jornals(env):
     _logger.warning('Archiving journals')
@@ -619,6 +651,7 @@ def migrate(env, installed_version):
     _update_leave_allocation(env)
     _delete_custom_financial_reports(env)
     _fix_tax_sat_type(env)
+    _fix_missing_translations(env)
     _logger.warning("Remove usage p01 from purchase orders")
     env.cr.execute("update purchase_order set l10n_mx_edi_usage = null where l10n_mx_edi_usage = 'P01';")
     _logger.warning("Set analytic decimal percentage to 10")
