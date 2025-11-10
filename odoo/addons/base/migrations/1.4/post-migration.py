@@ -17,6 +17,7 @@ to_install = [
     "report_sale_order_mtnmx",
     "l10n_mx_edi_decimal_fix",
     "account_bank_statement_mtnmx",
+    "report_account_payment_mtnmx",
 ]
 
 # List of modules to remove (uninstall)
